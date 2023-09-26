@@ -1,8 +1,18 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import MapView, {Marker,PROVIDER_GOOGLE } from 'react-native-maps';
-import MapStyle from './mapStyle'
+import { StyleSheet, Text, View, Platform } from 'react-native';
+import MapView, {Marker } from 'react-native-web-maps';
 
+
+let MapViewmob,MarkerMob;
+
+if (Platform.OS === 'android') {
+  // Import MapView and Marker for mobile
+  MapViewmob = require('react-native-maps').default;
+  MarkerMob = require('react-native-maps').Marker;
+}
+
+import loadGoogleMapsAPI from './webMapComponent'; // Import the function
+import MapStyle from './mapStyle';
 
 export default class ProfileScreen extends Component {
   constructor(props) {
@@ -10,11 +20,11 @@ export default class ProfileScreen extends Component {
     this.state = {
       region: {
         // latitude: 34.0522,   // Latitude for Los Angeles
-            // longitude: -118.2437, // Longitude for Los Angeles
-            latitude: 33.8704,   // Latitude for fullerton
-            longitude: -117.9242, // Longitude for fullerton
-            latitudeDelta: 0.1,//// Adjust this value for zoom level
-            longitudeDelta: 0.1,  // Adjust this value for zoom level
+        // longitude: -118.2437, // Longitude for Los Angeles
+        latitude: 33.8704,   // Latitude for fullerton
+        longitude: -117.9242, // Longitude for fullerton
+        latitudeDelta: 0.1, // Adjust this value for zoom level
+        longitudeDelta: 0.1,  // Adjust this value for zoom level
       },
       markers: [
         {
@@ -34,34 +44,57 @@ export default class ProfileScreen extends Component {
         },
         // Add more markers as needed
       ],
+      googleMapsLoaded: false,
     };
   }
- 
+
   onRegionChange(region) {
-    console.log('onRegionChange')
+    console.log('onRegionChange');
     this.setState({ region });
   }
 
+  componentDidMount() {
+    // Load Google Maps API and initialize the map
+    if (Platform.OS === 'web') {
+      loadGoogleMapsAPI(() => {
+        this.setState({ googleMapsLoaded: true });
+      });
+    }
+  }
 
   render() {
+    const { googleMapsLoaded } = this.state;
+
     return (
       <View style={styles.container}>
-       <MapView
-              provider={PROVIDER_GOOGLE}
-              style={styles.map}
-              initialRegion={this.state.region}
-              region={this.state.region}
-              onRegionChange={(region) => this.onRegionChange(region)}
-              customMapStyle={MapStyle}
-              {...this.state.markers.map((marker, index) => (
-                <Marker
-                  key={index}
-                  coordinate={marker.latlng}
-                  title={marker.title}
-                  description={marker.description}
-                />
-              ))}
-            /> 
+        {googleMapsLoaded && Platform.OS === 'web' ? ( // Conditional rendering based on API load
+          <MapView
+            style={styles.map}
+            initialRegion={this.state.region}
+            region={this.state.region}
+            onRegionChange={(region) => this.onRegionChange(region)}
+            customMapStyle={MapStyle}
+          />
+        ) : Platform.OS === 'android' ? (
+          <MapViewmob
+            style={styles.map}
+            initialRegion={this.state.region}
+            region={this.state.region}
+            onRegionChange={(region) => this.onRegionChange(region)}
+            customMapStyle={MapStyle}
+          >
+            {this.state.markers.map((marker, index) => (
+              <MarkerMob
+                key={index}
+                coordinate={marker.latlng}
+                title={marker.title}
+                description={marker.description}
+              />
+            ))}
+          </MapViewmob>
+        ) : (
+          <Text>LOADING....</Text>
+        )}
       </View>
     );
   }
