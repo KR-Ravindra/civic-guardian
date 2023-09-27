@@ -35,78 +35,7 @@ export default class ProfileScreen extends Component {
   constructor(props) {
     super(props);
     console.log("props", props);
-    this.state = {
-      region: {
-        // latitude: 34.0522,   // Latitude for Los Angeles
-        // longitude: -118.2437, // Longitude for Los Angeles
-        latitude: 33.8704, // Latitude for fullerton
-        longitude: -117.9242, // Longitude for fullerton
-        latitudeDelta: 0.1, // Adjust this value for zoom level
-        longitudeDelta: 0.1, // Adjust this value for zoom level
-      },
-      markerPosition: {
-        latitude: 33.8704, // Initial latitude for marker
-        longitude: -117.9242, // Initial longitude for marker
-      },
-      origin: { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
-      destination: { latitude: 34.01, longitude: -118.11 }, // Latitude and longitude for the destination marker
-      waypoint: { latitude: 33.995, longitude: -117.926 }, // Waypoint marker
-
-      markers: [
-        {
-          latlng: {
-            latitude: 33.8704,
-            longitude: -117.9242,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          },
-          title: "Marker Title 1",
-          description: "Marker Description 1",
-        },
-        {
-          latlng: {
-            latitude: 33.875,
-            longitude: -117.926,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          },
-          title: "Marker Title 2",
-          description: "Marker Description 2",
-        },
-        {
-          latlng: {
-            latitude: 33.865,
-            longitude: -117.928,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          },
-          title: "Marker Title 3",
-          description: "Marker Description 3",
-        },
-        {
-          latlng: {
-            latitude: 33.872,
-            longitude: -117.921,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          },
-          title: "Marker Title 4",
-          description: "Marker Description 4",
-        },
-        {
-          latlng: {
-            latitude: 33.869,
-            longitude: -117.923,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          },
-          title: "Marker Title 5",
-          description: "Marker Description 5",
-        },
-        // Add more markers as needed
-      ],
-      googleMapsLoaded: false,
-    };
+    this.state = props.stateOfMap;
   }
 
   componentDidMount() {
@@ -121,29 +50,20 @@ export default class ProfileScreen extends Component {
   onRegionChange(region) {
     this.setState({ region });
   }
-  handleButtonPress = () => {
-    // Handle button press logic here
-    alert("Button pressed!");
-  };
 
   render() {
     const {
-      googleMapsLoaded,
-      markerPosition,
+      region,
       origin,
       destination,
-      waypoint,
       markers,
+      googleMapsLoaded,
     } = this.state;
-    const coordinates = [
-      { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
-      { latitude: 34.01, longitude: -118.11 }, // Latitude and longitude for the destination marker
-      // { latitude: 33.9950, longitude: -117.9260 },
-    ];
     return (
       <View style={styles.container}>
+        {console.log(markers)}
         <ErrorBoundary>
-          {googleMapsLoaded && markerPosition && Platform.OS === "web" ? (
+          {googleMapsLoaded && Platform.OS === "web" ? (
             <View style={styles.container}>
               <MapView
                 style={styles.map}
@@ -153,17 +73,23 @@ export default class ProfileScreen extends Component {
                 customMapStyle={MapStyle}
               >
                 <MapView.Marker coordinate={origin} title="Origin" />
-                <MapView.Marker coordinate={waypoint} title="Waypoint" />
                 <MapView.Marker coordinate={destination} title="Destination" />
 
+                {markers.map((marker, index) => (
+                  <MapView.Marker
+                    key={index}
+                    coordinate={marker.latlng}
+                    title={marker.title}
+                    description={marker.description}
+                  />
+                ))}
                 <MapView.Polyline
-                  coordinates={coordinates}
+                  coordinates={[origin, destination]}
                   strokeWidth={4}
                   strokeColor="blue"
                 />
 
               </MapView>
-
             </View>
           ) : Platform.OS === "android" ? (
             <MapViewMob
@@ -174,11 +100,9 @@ export default class ProfileScreen extends Component {
               customMapStyle={MapStyle}
             >
               <MarkerMob coordinate={origin} title="Origin" />
-              <MarkerMob coordinate={waypoint} title="Waypoint" />
               <MarkerMob coordinate={destination} title="Destination" />
               <MapViewDirectionsMob
                 origin={origin}
-                waypoints={[waypoint]}
                 destination={destination}
                 apikey={apiKey}
                 strokeWidth={4}
