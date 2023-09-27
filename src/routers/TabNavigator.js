@@ -7,7 +7,7 @@ import { Keyboard, TouchableOpacity,View,SafeAreaView } from 'react-native';
 import HomeScreen from '../components/home'
 import ProfileScreen from '../components/profile'
 import SearchScreen from '../components/search'
-
+import TestScreen from '../components/Test/test';
 
 
 const TabBar = ({ state, navigation }) => {
@@ -66,6 +66,7 @@ const TabBar = ({ state, navigation }) => {
                           {label === 'Home' && <Ionicons name="home" size={24} color="white" />}
                           {label === 'Search' && <Entypo name="magnifying-glass" size={24} color="white" />}
                           {label === 'Profile' && <FontAwesome name="user" size={24} color="white" />}
+                          {label === 'Test' && <Ionicons name="alert" size={24} color="white" />}
                       </TouchableOpacity>
                   ); 
           })}   
@@ -99,6 +100,10 @@ export const TabNavigator = () => {
             <Tab.Screen
                 name='Profile'
                 component={ProfileScreen}
+            />
+            <Tab.Screen
+                name='Test'
+                component={TestScreen}
             />
             </Tab.Navigator>
         </SafeAreaView>
