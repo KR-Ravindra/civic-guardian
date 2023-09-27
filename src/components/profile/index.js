@@ -10,8 +10,8 @@ const MainMapScreen = () => {
       region: {
         latitude: 33.8704, // Latitude for fullerton
         longitude: -117.9242, // Longitude for fullerton
-        latitudeDelta: 0.1, // Adjust this value for zoom level
-        longitudeDelta: 0.1, // Adjust this value for zoom level
+        latitudeDelta: 0.01, // Adjust this value for zoom level
+        longitudeDelta: 0.01, // Adjust this value for zoom level
       },
       origin: { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
       destination: {
@@ -80,7 +80,7 @@ const MainMapScreen = () => {
         <ErrorBoundary>
           <View style={styles.container}>
           <ShowMapScreen stateOfMap={stateOfMap}></ShowMapScreen>
-          <TouchableOpacity style={styles.button} onPress={() => {setStateOfMap(stateOfMap.markers=[]),console.log(stateOfMap)}}><Text>Generate Waypoints</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => {setStateOfMap(stateOfMap.markers=[]),console.log(stateOfMap,'setState')}}><Text>Generate Waypoints</Text></TouchableOpacity>
           </View>
         </ErrorBoundary>
         </View>

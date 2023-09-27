@@ -61,7 +61,7 @@ export default class ProfileScreen extends Component {
     } = this.state;
     return (
       <View style={styles.container}>
-        {console.log(markers)}
+        {console.log("Booted", markers)}
         <ErrorBoundary>
           {googleMapsLoaded && Platform.OS === "web" ? (
             <View style={styles.container}>
