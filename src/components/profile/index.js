@@ -17,12 +17,14 @@ if (Platform.OS === 'android') {
   MarkerMob = require('react-native-maps').Marker;
   MapViewDirectionsMob = require('react-native-maps-directions').MapViewDirections;
 }
-let MapView, Marker,MapViewDirections;
+let MapView, Marker,MapViewDirections,Polyline;
 
 if (Platform.OS === 'web') {
   // Import components for web
   MapView = require('react-native-web-maps').default;
-  Marker = require('react-native-web-maps').Marker;
+  Marker = require('react-native-web-maps').default;
+  Polyline = require('react-native-web-maps').default;
+
   // MapViewDirections = require('react-native-maps-directions').MapViewDirections;
 }
 
@@ -97,7 +99,11 @@ export default class ProfileScreen extends Component {
 
   render() {
     const { googleMapsLoaded, markerPosition,origin,destination,waypoint,markers } = this.state;
-
+    const coordinates = [
+     { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
+    { latitude: 34.0100, longitude: -118.1100 }, // Latitude and longitude for the destination marker
+  // { latitude: 33.9950, longitude: -117.9260 },
+    ];
     return (
       
       <View style={styles.container}>
@@ -110,28 +116,15 @@ export default class ProfileScreen extends Component {
             onRegionChange={(region) => this.onRegionChange(region)}
             customMapStyle={MapStyle}
           >
-          {/* {markers && markers.map((marker, index) => (
-            <Marker
-              key={index}
-              coordinate={marker.latlng}
-              title={marker.title}
-              description={marker.description}
-            />   
-  ))}   */}
-  <Marker coordinate={{latitude: 33.8704, longitude: -117.9242}}/>
-
-            {/* {origin && destination ?
-            <>
-            <Marker coordinate={origin} title="Origin" />
-            <Marker coordinate={waypoint} title="Waypoint" />
-            <Marker coordinate={destination} title="Destination" />
-            </>
-            :null
-
-            } */}
-          {/* <Marker coordinate={origin} title="Origin" />
-          <Marker coordinate={waypoint} title="Waypoint" />
-          <Marker coordinate={destination} title="Destination" /> */}
+          <MapView.Marker coordinate={origin} title="Origin" />
+          <MapView.Marker coordinate={waypoint} title="Waypoint" />
+          <MapView.Marker coordinate={destination} title="Destination" />
+         
+          <MapView.Polyline
+          coordinates={coordinates}
+          strokeWidth={4}
+          strokeColor="blue"
+        />
 
             {/* <MapViewDirections
             origin={origin}
