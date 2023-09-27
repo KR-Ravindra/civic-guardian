@@ -79,7 +79,7 @@ export const TabNavigator = () => {
     return (
         <SafeAreaView style={ { flex: 1, backgroundColor: '#fff' }}>
             <Tab.Navigator
-                initialRouteName='Home'
+                initialRouteName='Profile'
                 header={null}
                 headerMode='none'
                 tabBar={props => <TabBar {...props} />}
