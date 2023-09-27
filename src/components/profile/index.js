@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Platform } from 'react-native';
 // import {MapView,Marker}  from 'react-native-web-maps';
-// import Marker from 'react-native-web-maps';
+// import {Marker} from 'react-native-web-maps';
 // import MapViewDirections from 'react-native-maps-directions';
 
 import loadGoogleMapsAPI from './webMapComponent'; // Import the function
@@ -9,12 +9,12 @@ import MapStyle from './mapStyle';
 import ErrorBoundary from '../errorBoundry';
 
 
-let MapViewmob, MarkerMob,MapViewDirectionsMob;
+let MapViewMob, MarkerMob,MapViewDirectionsMob;
 
 if (Platform.OS === 'android') {
   // Import components for mobile (Android)
-  MapView = require('react-native-maps').default;
-  Marker = require('react-native-maps').Marker;
+  MapViewMob = require('react-native-maps').default;
+  MarkerMob = require('react-native-maps').Marker;
   MapViewDirectionsMob = require('react-native-maps-directions').MapViewDirections;
 }
 let MapView, Marker,MapViewDirections;
@@ -22,7 +22,7 @@ let MapView, Marker,MapViewDirections;
 if (Platform.OS === 'web') {
   // Import components for web
   MapView = require('react-native-web-maps').default;
-  Marker = require('react-native-web-maps').default;
+  Marker = require('react-native-web-maps').Marker;
   // MapViewDirections = require('react-native-maps-directions').MapViewDirections;
 }
 
@@ -110,17 +110,16 @@ export default class ProfileScreen extends Component {
             onRegionChange={(region) => this.onRegionChange(region)}
             customMapStyle={MapStyle}
           >
-          {markers && markers.map((marker, index) => (
+          {/* {markers && markers.map((marker, index) => (
             <Marker
               key={index}
               coordinate={marker.latlng}
               title={marker.title}
               description={marker.description}
             />   
-  ))}  
-  <Marker coordinate={{latitude: 33.8704, longitude: -117.9242}}>
+  ))}   */}
+  <Marker coordinate={{latitude: 33.8704, longitude: -117.9242}}/>
 
-</Marker>
             {/* {origin && destination ?
             <>
             <Marker coordinate={origin} title="Origin" />
@@ -144,7 +143,7 @@ export default class ProfileScreen extends Component {
           />   */}
           </MapView>
         ) : Platform.OS === 'android' ? (
-          <MapViewmob
+          <MapViewMob
             style={styles.map}
             initialRegion={this.state.region}
             region={this.state.region}
@@ -170,7 +169,7 @@ export default class ProfileScreen extends Component {
             strokeWidth={4}
             strokeColor="hotpink"
           />
-          </MapViewmob>
+          </MapViewMob>
         ) : (
           <Text>LOADING....</Text>
         )}
