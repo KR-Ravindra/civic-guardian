@@ -33,9 +33,8 @@ export default class ProfileScreen extends Component {
         longitude: -117.9242, // Initial longitude for marker
       },
       origin: { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
-      destination: { latitude: 34.0200, longitude: -118.1200 }, // Latitude and longitude for the destination marker
-      waypoint : { latitude: 33.8750, longitude: -117.9260 }, // Waypoint marker
-      routeCoordinates: [], // Array to store decoded route coordinates
+      destination: { latitude: 34.0100, longitude: -118.1100 }, // Latitude and longitude for the destination marker
+      waypoint : { latitude: 33.9950, longitude: -117.9260 }, // Waypoint marker
   
       markers: [
         {
@@ -78,7 +77,6 @@ export default class ProfileScreen extends Component {
     if (Platform.OS === 'web') {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
-        // this.fetchRoute();// Fetch and decode the route coordinates
       });
     }
   }
@@ -140,7 +138,7 @@ export default class ProfileScreen extends Component {
             waypoints={[waypoint]}
             destination={destination}
             apikey={apiKey}
-            strokeWidth={3}
+            strokeWidth={4}
             strokeColor="hotpink"
           />
           </MapViewmob>
