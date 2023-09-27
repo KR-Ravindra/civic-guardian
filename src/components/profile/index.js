@@ -1,20 +1,32 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Platform } from 'react-native';
-import MapView, {Marker } from 'react-native-web-maps';
+// import {MapView,Marker}  from 'react-native-web-maps';
 // import Marker from 'react-native-web-maps';
-import MapViewDirections from 'react-native-maps-directions';
+// import MapViewDirections from 'react-native-maps-directions';
 
 import loadGoogleMapsAPI from './webMapComponent'; // Import the function
 import MapStyle from './mapStyle';
+import ErrorBoundary from '../errorBoundry';
 
-let MapViewmob, MarkerMob;
+
+let MapViewmob, MarkerMob,MapViewDirectionsMob;
 
 if (Platform.OS === 'android') {
-  // Import MapView for mobile
-  MapViewmob = require('react-native-maps').default;
-  MarkerMob = require('react-native-maps').Marker;
+  // Import components for mobile (Android)
+  MapView = require('react-native-maps').default;
+  Marker = require('react-native-maps').Marker;
+  MapViewDirectionsMob = require('react-native-maps-directions').MapViewDirections;
 }
-const apiKey = 'AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E'; // Replace with your Google Maps API key
+let MapView, Marker,MapViewDirections;
+
+if (Platform.OS === 'web') {
+  // Import components for web
+  MapView = require('react-native-web-maps').default;
+  Marker = require('react-native-web-maps').default;
+  // MapViewDirections = require('react-native-maps-directions').MapViewDirections;
+}
+
+const apiKey = 'AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E'; //  Google Maps API key
 
 export default class ProfileScreen extends Component {
   constructor(props) {
@@ -68,10 +80,6 @@ export default class ProfileScreen extends Component {
     };
   }
 
-  onRegionChange(region) {
-    this.setState({ region });
-  }
-
   componentDidMount() {
     // Load Google Maps API and initialize the map
     if (Platform.OS === 'web') {
@@ -81,39 +89,60 @@ export default class ProfileScreen extends Component {
     }
   }
 
+  onRegionChange(region) {
+    this.setState({ region });
+  }
+
+ 
+
   render() {
-    const { googleMapsLoaded, markerPosition,origin,destination,waypoint } = this.state;
+    const { googleMapsLoaded, markerPosition,origin,destination,waypoint,markers } = this.state;
 
     return (
+      
       <View style={styles.container}>
-        {googleMapsLoaded && Platform.OS === 'web' ? (
+        <ErrorBoundary>
+        {googleMapsLoaded && markerPosition && Platform.OS === 'web' ? (
           <MapView
             style={styles.map}
             initialRegion={this.state.region}
             region={this.state.region}
             onRegionChange={(region) => this.onRegionChange(region)}
             customMapStyle={MapStyle}
-          />
-  //            {this.state.markers.map((marker, index) => (
-  //           <Marker
-  //             key={index}
-  //             coordinate={marker.latlng}
-  //             title={marker.title}
-  //             description={marker.description}
-  //           />
-  // ))} 
-          // <Marker coordinate={origin} title="Origin" />
-          // <Marker coordinate={waypoint} title="Waypoint" />
-          // <Marker coordinate={destination} title="Destination" />
-          // <MapViewDirections
-          //   origin={origin}
-          //   waypoints={[waypoint]}
-          //   destination={destination}
-          //   apikey={apiKey}
-          //   strokeWidth={3}
-          //   strokeColor="hotpink"
-          // /> 
-          // </MapView>
+          >
+          {markers && markers.map((marker, index) => (
+            <Marker
+              key={index}
+              coordinate={marker.latlng}
+              title={marker.title}
+              description={marker.description}
+            />   
+  ))}  
+  <Marker coordinate={{latitude: 33.8704, longitude: -117.9242}}>
+
+</Marker>
+            {/* {origin && destination ?
+            <>
+            <Marker coordinate={origin} title="Origin" />
+            <Marker coordinate={waypoint} title="Waypoint" />
+            <Marker coordinate={destination} title="Destination" />
+            </>
+            :null
+
+            } */}
+          {/* <Marker coordinate={origin} title="Origin" />
+          <Marker coordinate={waypoint} title="Waypoint" />
+          <Marker coordinate={destination} title="Destination" /> */}
+
+            {/* <MapViewDirections
+            origin={origin}
+            waypoints={[waypoint]}
+            destination={destination}
+            apikey={apiKey}
+            strokeWidth={3}
+            strokeColor="hotpink"
+          />   */}
+          </MapView>
         ) : Platform.OS === 'android' ? (
           <MapViewmob
             style={styles.map}
@@ -133,7 +162,7 @@ export default class ProfileScreen extends Component {
           <MarkerMob coordinate={origin} title="Origin" />
           <MarkerMob coordinate={waypoint} title="Waypoint" />
           <MarkerMob coordinate={destination} title="Destination" />
-          <MapViewDirections
+          <MapViewDirectionsMob
             origin={origin}
             waypoints={[waypoint]}
             destination={destination}
@@ -145,9 +174,12 @@ export default class ProfileScreen extends Component {
         ) : (
           <Text>LOADING....</Text>
         )}
+  </ErrorBoundary>
+
       </View>
     );
   }
+
 }
 
 const styles = StyleSheet.create({
