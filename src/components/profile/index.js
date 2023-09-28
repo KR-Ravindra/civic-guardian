@@ -3,13 +3,6 @@ import { StyleSheet, Text, View, Platform } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Polyline,
-  Popup,
-} from "react-leaflet";
 
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
@@ -28,6 +21,17 @@ if (Platform.OS === "web") {
   // Import components for web
   MapView = require("@preflower/react-native-web-maps").default;
 }
+
+
+// Create the debounce function
+const debounce = (func, delay) => {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+};
+
 
 export default class ProfileScreen extends Component {
   constructor(props) {
@@ -105,6 +109,7 @@ export default class ProfileScreen extends Component {
       googleMapsLoaded: false,
       routeCoordinates: [], // Store the route coordinates here
     };
+    this.debouncedOnRegionChange = debounce(this.onRegionChange, 300); 
   }
 
   componentDidMount() {
@@ -182,6 +187,20 @@ export default class ProfileScreen extends Component {
     this.setState({ region });
   }
 
+  //  Create a debounced version of onRegionChange
+  debouncedOnRegionChange = debounce((newRegion) => {
+    // Check if the new region has valid latitude and longitude
+    if (
+      !isNaN(newRegion.latitude) &&
+      !isNaN(newRegion.longitude) &&
+      isFinite(newRegion.latitude) &&
+      isFinite(newRegion.longitude)
+    ) {
+      // Update the state only if the new region has valid coordinates
+      this.setState({ region: newRegion });
+    }
+  }, 100);
+
   render() {
     const {
       googleMapsLoaded,
@@ -189,46 +208,44 @@ export default class ProfileScreen extends Component {
       destination,
       waypoint,
       routeCoordinates,
+      markers
     } = this.state;
-    const coordinates = [origin, waypoint, destination];
-    let polyCordinates = [routeCoordinates];
-    console.log(polyCordinates, "polyCordinates");
-    // const routeCoordinates = [source, way,dest];
 
     return (
       <View style={styles.container}>
         {googleMapsLoaded && Platform.OS === "web" ? (
-          // <MapView
-          //   style={styles.map}
-          //   initialRegion={this.state.region}
-          //   region={this.state.region}
-          //   onRegionChange={(region) => this.onRegionChange(region)}
-          //   customMapStyle={MapStyle}
+          <MapView
+            style={styles.map}
+            initialRegion={this.state.region}
+            region={this.state.region}
+            onRegionChange={this.debouncedOnRegionChange}
+            customMapStyle={MapStyle}
 
-          // >
-          //   <MapView.Marker coordinate={origin} title="Origin" />
-          //   <MapView.Marker coordinate={waypoint} title="Waypoint" />
-          //   <MapView.Marker coordinate={destination} title="Destination" />
-          //   <MapView.Polyline coordinates={[origin, destination]} strokeColor="blue" strokeWidth={5} />
-
-          // </MapView>
-
-          <MapContainer
-            center={[33.9, -117.9]}
-            zoom={10}
-            style={{ height: "500px", width: "100%" }}
           >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <Marker position={[33.8704, -117.9242]} title="Origin" />
-            <Marker position={[33.995, -117.926]} title="Waypoint" />
-            <Marker position={[34.01, -118.11]} title="Destination" />
+             <MapView.Marker coordinate={origin} title="Origin" />
+              <MapView.Marker coordinate={destination} title="Destination" />
 
-            {/* Render the route as a polyline */}
-            <Polyline positions={routeCoordinates} color="blue" weight={5} />
-          </MapContainer>
+                { markers.map((marker, index) => (
+                  <MapView.Marker
+                    key={index}
+                    coordinate={marker.latlng}
+                    title={marker.title}
+                    description={marker.description}
+                  />
+                ))}
+    
+            {console.log("Cords are", routeCoordinates) || routeCoordinates && (
+                  <MapView.Polyline
+                    coordinates={routeCoordinates.map((coord) => ({
+                      latitude: coord[0],
+                      longitude: coord[1],
+                    }))}
+                    strokeWidth={4}
+                    strokeColor="blue"
+                  />
+                )}
+
+          </MapView>
         ) : Platform.OS === "android" ? (
           <MapViewMob
             style={styles.map}
@@ -238,15 +255,23 @@ export default class ProfileScreen extends Component {
             customMapStyle={MapStyle}
           >
             <MarkerMob coordinate={origin} title="Origin" />
-            <MarkerMob coordinate={waypoint} title="Waypoint" />
             <MarkerMob coordinate={destination} title="Destination" />
+                { markers.map((marker, index) => (
+                  <MarkerMob
+                    key={index}
+                    coordinate={marker.latlng}
+                    title={marker.title}
+                    description={marker.description}
+                  />
+                ))}
+           
             <MapViewDirectionsMob
               origin={origin}
               waypoints={[waypoint]}
               destination={destination}
               apikey={apiKey}
               strokeWidth={4}
-              strokeColor="hotpink"
+              strokeColor="blue"
             />
           </MapViewMob>
         ) : (
