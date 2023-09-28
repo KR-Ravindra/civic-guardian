@@ -67,8 +67,8 @@ const MainMapScreen = () => {
       },
       origin: { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
       destination: {
-        latitude: 33.8704,
-        longitude: -117.9242,
+        latitude: 33.869,
+        longitude: -117.923,
       }, // Latitude and longitude for the destination marker
       markers: newMarkers,
       googleMapsLoaded: false,

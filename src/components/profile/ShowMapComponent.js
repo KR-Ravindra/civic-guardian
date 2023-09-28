@@ -24,8 +24,8 @@ let MapView, Marker, Polyline;
 
 if (Platform.OS === "web") {
 
-  MapView = require("react-native-web-maps").default;
-  Polyline = require("react-native-web-maps").default;
+  MapView = require('@preflower/react-native-web-maps').default;
+  Polyline = require('@preflower/react-native-web-maps').default;
 }
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
@@ -44,11 +44,7 @@ export default class ProfileScreen extends Component {
       });
     }
   }
-  componentDidUpdate(prevProps) {
-    if (prevProps.markers !== this.props.markers) {
-      this.forceUpdate();
-    }
-  }
+
 
   onRegionChange(region) {
     this.setState({ region });
@@ -76,7 +72,6 @@ export default class ProfileScreen extends Component {
                 initialRegion={this.state.region}
                 region={this.state.region}
                 onRegionChange={(region) => this.onRegionChange(region)}
-                customMapStyle={MapStyle}
               >
                 <MapView.Marker coordinate={origin} title="Origin" />
                 <MapView.Marker coordinate={destination} title="Destination" />
@@ -90,13 +85,10 @@ export default class ProfileScreen extends Component {
                   />
                 ))}
                 <MapView.Polyline
-                  origin={origin}
-                  destination={destination}
+                  coordinates={[origin, destination]}
                   apiKey={apiKey}
-                  strokeWidth={400}
+                  strokeWidth={4}
                   strokeColor="blue"
-                  zIndex={1}
-                  opacity={1}
                 />
 
               </MapView>
