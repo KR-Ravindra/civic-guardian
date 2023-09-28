@@ -59,6 +59,7 @@ const MainMapScreen = () => {
       },
     ];
     const [stateOfMap, setStateOfMap] = useState({
+      coords: [],
       region: {
         latitude: 33.8704, // Latitude for fullerton
         longitude: -117.9242, // Longitude for fullerton

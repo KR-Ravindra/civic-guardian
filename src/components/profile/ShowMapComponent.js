@@ -84,13 +84,13 @@ export default class ProfileScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                <MapView.Polyline
-                  coordinates={[origin, destination]}
-                  apiKey={apiKey}
-                  strokeWidth={4}
-                  strokeColor="blue"
-                />
-
+                {true && (
+                  <MapView.Polyline
+                    coordinates={[origin, destination]}
+                    strokeWidth={4}
+                    strokeColor="hotpink"
+                  />
+                )}
               </MapView>
             </View>
           ) : Platform.OS === "android" ? (
