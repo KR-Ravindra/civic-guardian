@@ -41,18 +41,105 @@ export default class ProfileScreen extends Component {
     if (Platform.OS === "web") {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
+
+        // Define waypoints as latitude and longitude coordinates
+        const origin = "33.8704,-117.9242"; // Replace with your origin coordinates
+        const waypoint = "33.872,-117.921"; // Replace with your waypoint coordinates
+        const destination = "33.869,-117.923"; // Replace with your destination coordinates
+
+        // Update the proxy URL to "CORS Anywhere"
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+        // Construct the URL for the Google Directions API request
+        const apiUrl = `${proxyUrl}https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+        //  const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+
+        // Make an API request to the Google Directions API
+        fetch(apiUrl)
+          .then((response) => response.text()) // Get the response body as text
+          .then((data) => {
+            const parsedData = JSON.parse(data); // Parse the JSON string into an object
+            if (parsedData.routes && parsedData.routes.length > 0) {
+              // Extract route coordinates from the parsed data
+              const coords = this.extractcoords(
+                parsedData.routes[0].overview_polyline,
+              );
+              this.setState({ coords });
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching route:", error);
+          });
       });
     }
   }
 
-
-  onRegionChange(region) {
-    this.setState({ region });
+  extractcoords(overviewPolyline) {
+    try {
+      if (
+        overviewPolyline &&
+        window.google &&
+        window.google.maps &&
+        window.google.maps.geometry &&
+        window.google.maps.geometry.encoding
+      ) {
+        // Decode the encoded polyline and return an array of coordinates
+        const points = window.google.maps.geometry.encoding.decodePath(
+          overviewPolyline.points
+        );
+        if (points && points.length > 0) {
+          return points.map((point) => [point.lat(), point.lng()]);
+        } else {
+          console.error("No points found in the decoded polyline");
+          // Return an empty array or handle this case according to your needs
+          return [];
+        }
+      } else {
+        console.error(
+          "Google Maps JavaScript API not loaded or encoding library not available"
+        );
+        // Return an empty array or handle this case according to your needs
+        return [];
+      }
+    } catch (error) {
+      console.error("Error decoding polyline:", error);
+      // Return an empty array or handle this case according to your needs
+      return [];
+    }
   }
 
+  onRegionChange = (region) => {
+    {
+      const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
+      this.setState({
+        region: {
+          latitude,
+          longitude,
+          latitudeDelta,
+          longitudeDelta,
+        },
+      });
+    };
+  }
+
+  onRegionChangeComplete = (region) => {
+    console.log("Region changed:", region);
+  };
+
+  onPress = (event) => {
+    console.log("Map pressed:", event.nativeEvent.coordinate);
+  };
+
+  onDoublePress = (event) => {
+    console.log("Map double pressed:", event.nativeEvent.coordinate);
+  };
+
+  onPanDrag = () => {
+    console.log("Map panned or dragged");
+  };
 
   render() {
     const {
+      coords,
       region,
       origin,
       destination,
@@ -61,9 +148,6 @@ export default class ProfileScreen extends Component {
     } = this.state;
     return (
       <View style={styles.container}>
-        {console.log("Booted", markers)}
-        {console.log("Origin", origin)}
-        {console.log("destination", destination)}
         <ErrorBoundary>
           {googleMapsLoaded && Platform.OS === "web" ? (
             <View style={styles.container}>
@@ -71,12 +155,18 @@ export default class ProfileScreen extends Component {
                 style={styles.map}
                 initialRegion={this.state.region}
                 region={this.state.region}
-                onRegionChange={(region) => this.onRegionChange(region)}
+                onRegionChange={(new_region) => {this.onRegionChange(new_region)}}
+                onRegionChangeComplete={this.onRegionChangeComplete}
+                onPress={this.onPress}
+                onDoublePress={this.onDoublePress}
+                onPanDrag={this.onPanDrag}
+                zoomEnabled={true}
+                zoomControlEnabled={true}
               >
                 <MapView.Marker coordinate={origin} title="Origin" />
                 <MapView.Marker coordinate={destination} title="Destination" />
 
-                {console.log("Markers are: ", markers) || markers.map((marker, index) => (
+                { markers.map((marker, index) => (
                   <MapView.Marker
                     key={index}
                     coordinate={marker.latlng}
@@ -84,11 +174,14 @@ export default class ProfileScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                {true && (
+                {console.log("Cords are", coords) || coords && (
                   <MapView.Polyline
-                    coordinates={[origin, destination]}
+                    coordinates={coords.map((coord) => ({
+                      latitude: coord[0],
+                      longitude: coord[1],
+                    }))}
                     strokeWidth={4}
-                    strokeColor="hotpink"
+                    strokeColor="grey"
                   />
                 )}
               </MapView>

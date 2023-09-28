@@ -80,7 +80,7 @@ const MainMapScreen = () => {
         <ErrorBoundary>
           <View style={styles.container}>
           <ShowMapScreen stateOfMap={stateOfMap}></ShowMapScreen>
-          <TouchableOpacity style={styles.button} onPress={() => {setStateOfMap(...stateOfMap.markers = newMarkers), console.log("current_state",stateOfMap)}}><Text>Generate Waypoints</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => {setStateOfMap(...stateOfMap.markers = newMarkers)}}><Text>Generate Waypoints</Text></TouchableOpacity>
           </View>
         </ErrorBoundary>
         </View>
