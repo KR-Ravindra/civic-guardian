@@ -127,8 +127,9 @@ export default class ProfileScreen extends Component {
 
      // Make an API request to the Google Directions API
      fetch(apiUrl)
-       .then((response) => response.json())
+       .then((response) => {response.text()})
        .then((data) => {
+        alert(response.text())
          if (data.routes && data.routes.length > 0) {
            // Extract route coordinates from the API response
            const routeCoordinates = this.extractRouteCoordinates(
