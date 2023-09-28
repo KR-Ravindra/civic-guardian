@@ -123,7 +123,7 @@ export default class ProfileScreen extends Component {
      const destination = "34.01,-118.11"; // Replace with your destination coordinates
 
      // Construct the URL for the Google Directions API request
-     const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+     const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
 
      // Make an API request to the Google Directions API
      fetch(apiUrl)
