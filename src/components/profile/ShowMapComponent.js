@@ -10,6 +10,7 @@ import {
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
+// import MapView, { Marker, Polyline } from "react-native-maps";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -19,14 +20,12 @@ if (Platform.OS === "android") {
   MapViewDirectionsMob =
     require("react-native-maps-directions").default;
 }
-let MapView, Marker, MapViewDirections, Polyline;
+let MapView, Marker, Polyline;
 
 if (Platform.OS === "web") {
 
   MapView = require("react-native-web-maps").default;
-  Marker = require("react-native-web-maps").Marker;
-  Polyline = require("react-native-web-maps").Polyline;
-
+  Polyline = require("react-native-web-maps").default;
 }
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
@@ -34,7 +33,6 @@ const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API ke
 export default class ProfileScreen extends Component {
   constructor(props) {
     super(props);
-    console.log("props", props);
     this.state = props.stateOfMap;
   }
 
@@ -46,10 +44,16 @@ export default class ProfileScreen extends Component {
       });
     }
   }
+  componentDidUpdate(prevProps) {
+    if (prevProps.markers !== this.props.markers) {
+      this.forceUpdate();
+    }
+  }
 
   onRegionChange(region) {
     this.setState({ region });
   }
+
 
   render() {
     const {
@@ -62,6 +66,8 @@ export default class ProfileScreen extends Component {
     return (
       <View style={styles.container}>
         {console.log("Booted", markers)}
+        {console.log("Origin", origin)}
+        {console.log("destination", destination)}
         <ErrorBoundary>
           {googleMapsLoaded && Platform.OS === "web" ? (
             <View style={styles.container}>
@@ -75,7 +81,7 @@ export default class ProfileScreen extends Component {
                 <MapView.Marker coordinate={origin} title="Origin" />
                 <MapView.Marker coordinate={destination} title="Destination" />
 
-                {markers.map((marker, index) => (
+                {console.log("Markers are: ", markers) || markers.map((marker, index) => (
                   <MapView.Marker
                     key={index}
                     coordinate={marker.latlng}
@@ -84,9 +90,13 @@ export default class ProfileScreen extends Component {
                   />
                 ))}
                 <MapView.Polyline
-                  coordinates={[origin, destination]}
-                  strokeWidth={4}
+                  origin={origin}
+                  destination={destination}
+                  apiKey={apiKey}
+                  strokeWidth={400}
                   strokeColor="blue"
+                  zIndex={1}
+                  opacity={1}
                 />
 
               </MapView>
