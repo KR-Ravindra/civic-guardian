@@ -15,9 +15,17 @@
       "**/*"
     ],
     "ios": {
+      "config": {
+        "googleMapsApiKey": "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+      },
       "supportsTablet": true
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+        }
+      },
         "permissions": [
           "ACCESS_COARSE_LOCATION",
           "ACCESS_FINE_LOCATION",
@@ -32,6 +40,9 @@
       }
     },
     "web": {
+      "config": {
+        "googleMapsApiKey": "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+      },
       "favicon": "./src/assets/favicon.png"
     }
   }

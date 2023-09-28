@@ -3,16 +3,16 @@ import {
   StyleSheet,
   Text,
   View,
-  Platform,
-  TouchableOpacity,
+  Platform
 } from "react-native";
-// import {MapView,Marker}  from 'react-native-web-maps';
-// import {Marker} from 'react-native-web-maps';
-// import MapViewDirections from 'react-native-maps-directions';
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
-import ErrorBoundary from "../errorBoundry";
+import { MapContainer, TileLayer,Marker,Polyline,Popup } from 'react-leaflet'
+// import 'leaflet/dist/leaflet.css';
+
+
+const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -21,20 +21,16 @@ if (Platform.OS === "android") {
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
   MapViewDirectionsMob =
-    require("react-native-maps-directions").MapViewDirections;
+    require("react-native-maps-directions").default;
 }
-let MapView, Marker, MapViewDirections, Polyline;
+let MapView
 
 if (Platform.OS === "web") {
   // Import components for web
   MapView = require("react-native-web-maps").default;
-  Marker = require("react-native-web-maps").default;
-  Polyline = require("react-native-web-maps").default;
+  require('leaflet/dist/leaflet.css');
 
-  // MapViewDirections = require('react-native-maps-directions').MapViewDirections;
 }
-
-const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
 
 export default class ProfileScreen extends Component {
   constructor(props) {
@@ -110,6 +106,7 @@ export default class ProfileScreen extends Component {
         // Add more markers as needed
       ],
       googleMapsLoaded: false,
+      routeCoordinates: [],// Store the route coordinates here
     };
   }
 
@@ -119,16 +116,48 @@ export default class ProfileScreen extends Component {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
       });
-    }
+
+     // Define waypoints as latitude and longitude coordinates
+     const origin = "33.8704,-117.9242"; // Replace with your origin coordinates
+     const waypoint = "33.995,-117.926"; // Replace with your waypoint coordinates
+     const destination = "34.01,-118.11"; // Replace with your destination coordinates
+
+     // Construct the URL for the Google Directions API request
+     const apiUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+
+     // Make an API request to the Google Directions API
+     fetch(apiUrl)
+       .then((response) => response.json())
+       .then((data) => {
+         if (data.routes && data.routes.length > 0) {
+           // Extract route coordinates from the API response
+           const routeCoordinates = this.extractRouteCoordinates(
+             data.routes[0].overview_polyline
+           );
+           this.setState({ routeCoordinates });
+         }
+       })
+       .catch((error) => {
+         console.error("Error fetching route:", error);
+       });
+
   }
+}
+
+extractRouteCoordinates(polyline) {
+  // Decodes the encoded polyline and returns an array of coordinates
+  const points = window.google.maps.geometry.encoding.decodePath(
+    polyline.points
+  );
+  return points.map((point) => [point.lat(), point.lng()]);
+}
+
+
 
   onRegionChange(region) {
     this.setState({ region });
   }
-  handleButtonPress = () => {
-    // Handle button press logic here
-    alert("Button pressed!");
-  };
+
 
   render() {
     const {
@@ -137,60 +166,61 @@ export default class ProfileScreen extends Component {
       origin,
       destination,
       waypoint,
+      routeCoordinates,
       markers,
     } = this.state;
-    const coordinates = [
-      { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
-      { latitude: 34.01, longitude: -118.11 }, // Latitude and longitude for the destination marker
-      // { latitude: 33.9950, longitude: -117.9260 },
-    ];
+    const coordinates = [origin,waypoint, destination];
+    console.log(routeCoordinates,'routeCoordinates');
+    // const routeCoordinates = [source, way,dest];
+   
+
     return (
       <View style={styles.container}>
-        <ErrorBoundary>
-          {googleMapsLoaded && markerPosition && Platform.OS === "web" ? (
-            <View style={styles.container}>
-              <MapView
-                style={styles.map}
-                initialRegion={this.state.region}
-                region={this.state.region}
-                onRegionChange={(region) => this.onRegionChange(region)}
-                customMapStyle={MapStyle}
-              >
-                <MapView.Marker coordinate={origin} title="Origin" />
-                <MapView.Marker coordinate={waypoint} title="Waypoint" />
-                <MapView.Marker coordinate={destination} title="Destination" />
+ 
+          {googleMapsLoaded  && Platform.OS === "web" ? (
+      
+              // <MapView
+              //   style={styles.map}
+              //   initialRegion={this.state.region}
+              //   region={this.state.region}
+              //   onRegionChange={(region) => this.onRegionChange(region)}
+              //   customMapStyle={MapStyle}
+              // >
+              //   <MapView.Marker coordinate={origin} title="Origin" />
+              //   <MapView.Marker coordinate={waypoint} title="Waypoint" />
+              //   <MapView.Marker coordinate={destination} title="Destination" />
+              //   <MapView.Polyline   coordinates={[
+              //   { latitude: 33.8704, longitude: -117.9242 },
+              //   { latitude: 33.995, longitude: -117.926 },
+              //   { latitude: 34.01, longitude: -118.11 },
+              // ]}
+              // strokeWidth={4}
+              // strokeColor="blue" />
 
-                <MapView.Polyline
-                  coordinates={coordinates}
-                  strokeWidth={4}
-                  strokeColor="blue"
-                />
 
-                {/* <MapViewDirections
-            origin={origin}
-            waypoints={[waypoint]}
-            destination={destination}
-            apikey={apiKey}
-            strokeWidth={3}
-            strokeColor="hotpink"
-          />   */}
-              </MapView>
+        
+              // </MapView>
+        
+          // <Marker position={[origin.latitude,origin.longitude]} title="Origin" />
+          //   <Marker position={[waypoint.latitude,waypoint.longitude]} title="Waypoint" />
+          //   <Marker position={[destination.latitude,destination.longitude]} title="Destination" /> 
+          <MapContainer
+        center={[33.9, -117.9]}
+        zoom={10}
+        style={{ height: "500px", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+          <Marker position={[33.8704, -117.9242]} title="Origin" />
+          <Marker position={[33.995, -117.926]} title="Waypoint" />
+           <Marker position={[34.01, -118.11]} title="Destination" />
 
-              {/* Button */}
-              <TouchableOpacity
-                style={{
-                  position: "absolute",
-                  bottom: 20,
-                  right: 20,
-                  backgroundColor: "blue",
-                  padding: 10,
-                  borderRadius: 5,
-                }}
-                onPress={this.handleButtonPress}
-              >
-                <Text style={{ color: "white" }}>Button</Text>
-              </TouchableOpacity>
-            </View>
+        {/* Render the route as a polyline */}
+        <Polyline positions={routeCoordinates} color="blue" weight={10} />
+      </MapContainer>
+    
           ) : Platform.OS === "android" ? (
             <MapViewMob
               style={styles.map}
@@ -199,14 +229,7 @@ export default class ProfileScreen extends Component {
               onRegionChange={(region) => this.onRegionChange(region)}
               customMapStyle={MapStyle}
             >
-              {/* {this.state.markers.map((marker, index) => (
-              <MarkerMob
-                key={index}
-                coordinate={marker.latlng}
-                title={marker.title}
-                description={marker.description}
-              />
-            ))} */}
+             
               <MarkerMob coordinate={origin} title="Origin" />
               <MarkerMob coordinate={waypoint} title="Waypoint" />
               <MarkerMob coordinate={destination} title="Destination" />
@@ -222,7 +245,7 @@ export default class ProfileScreen extends Component {
           ) : (
             <Text>LOADING....</Text>
           )}
-        </ErrorBoundary>
+  
       </View>
     );
   }
