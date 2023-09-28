@@ -1,15 +1,15 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Platform
-} from "react-native";
+import { StyleSheet, Text, View, Platform } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
-import { MapContainer, TileLayer,Marker,Polyline,Popup } from 'react-leaflet'
-// import 'leaflet/dist/leaflet.css';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Polyline,
+  Popup,
+} from "react-leaflet";
 
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
@@ -20,16 +20,13 @@ if (Platform.OS === "android") {
   // Import components for mobile (Android)
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
-  MapViewDirectionsMob =
-    require("react-native-maps-directions").default;
+  MapViewDirectionsMob = require("react-native-maps-directions").default;
 }
-let MapView
+let MapView;
 
 if (Platform.OS === "web") {
   // Import components for web
-  MapView = require("react-native-web-maps").default;
-  require('leaflet/dist/leaflet.css');
-
+  MapView = require("@preflower/react-native-web-maps").default;
 }
 
 export default class ProfileScreen extends Component {
@@ -106,7 +103,7 @@ export default class ProfileScreen extends Component {
         // Add more markers as needed
       ],
       googleMapsLoaded: false,
-      routeCoordinates: [],// Store the route coordinates here
+      routeCoordinates: [], // Store the route coordinates here
     };
   }
 
@@ -115,138 +112,146 @@ export default class ProfileScreen extends Component {
     if (Platform.OS === "web") {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
+
+        // Define waypoints as latitude and longitude coordinates
+        const origin = "33.8704,-117.9242"; // Replace with your origin coordinates
+        const waypoint = "33.995,-117.926"; // Replace with your waypoint coordinates
+        const destination = "34.01,-118.11"; // Replace with your destination coordinates
+
+        // Update the proxy URL to "CORS Anywhere"
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+        // Construct the URL for the Google Directions API request
+        const apiUrl = `${proxyUrl}https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+        //  const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+
+        // Make an API request to the Google Directions API
+        fetch(apiUrl)
+          .then((response) => response.text()) // Get the response body as text
+          .then((data) => {
+            const parsedData = JSON.parse(data); // Parse the JSON string into an object
+            if (parsedData.routes && parsedData.routes.length > 0) {
+              // Extract route coordinates from the parsed data
+              const routeCoordinates = this.extractRouteCoordinates(
+                parsedData.routes[0].overview_polyline
+              );
+              this.setState({ routeCoordinates });
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching route:", error);
+          });
       });
-
-     // Define waypoints as latitude and longitude coordinates
-     const origin = "33.8704,-117.9242"; // Replace with your origin coordinates
-     const waypoint = "33.995,-117.926"; // Replace with your waypoint coordinates
-     const destination = "34.01,-118.11"; // Replace with your destination coordinates
-
-     // Construct the URL for the Google Directions API request
-     const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
-
-     // Make an API request to the Google Directions API
-     fetch(apiUrl)
-       .then((response) => {response.text()})
-       .then((data) => {
-        alert(response.text())
-         if (data.routes && data.routes.length > 0) {
-           // Extract route coordinates from the API response
-           const routeCoordinates = this.extractRouteCoordinates(
-             data.routes[0].overview_polyline
-           );
-           this.setState({ routeCoordinates });
-         }
-       })
-       .catch((error) => {
-         console.error("Error fetching route:", error);
-       });
-
+    }
   }
-}
 
-extractRouteCoordinates(polyline) {
-  // Decodes the encoded polyline and returns an array of coordinates
-  const points = window.google.maps.geometry.encoding.decodePath(
-    polyline.points
-  );
-  return points.map((point) => [point.lat(), point.lng()]);
-}
-
-
+  extractRouteCoordinates(overviewPolyline) {
+    try {
+      if (
+        overviewPolyline &&
+        window.google &&
+        window.google.maps &&
+        window.google.maps.geometry &&
+        window.google.maps.geometry.encoding
+      ) {
+        // Decode the encoded polyline and return an array of coordinates
+        const points = window.google.maps.geometry.encoding.decodePath(
+          overviewPolyline.points
+        );
+        if (points && points.length > 0) {
+          return points.map((point) => [point.lat(), point.lng()]);
+        } else {
+          console.error("No points found in the decoded polyline");
+          // Return an empty array or handle this case according to your needs
+          return [];
+        }
+      } else {
+        console.error(
+          "Google Maps JavaScript API not loaded or encoding library not available"
+        );
+        // Return an empty array or handle this case according to your needs
+        return [];
+      }
+    } catch (error) {
+      console.error("Error decoding polyline:", error);
+      // Return an empty array or handle this case according to your needs
+      return [];
+    }
+  }
 
   onRegionChange(region) {
     this.setState({ region });
   }
 
-
   render() {
     const {
       googleMapsLoaded,
-      markerPosition,
       origin,
       destination,
       waypoint,
       routeCoordinates,
-      markers,
     } = this.state;
-    const coordinates = [origin,waypoint, destination];
-    console.log(routeCoordinates,'routeCoordinates');
+    const coordinates = [origin, waypoint, destination];
+    let polyCordinates = [routeCoordinates];
+    console.log(polyCordinates, "polyCordinates");
     // const routeCoordinates = [source, way,dest];
-   
 
     return (
       <View style={styles.container}>
- 
-          {googleMapsLoaded  && Platform.OS === "web" ? (
-      
-              // <MapView
-              //   style={styles.map}
-              //   initialRegion={this.state.region}
-              //   region={this.state.region}
-              //   onRegionChange={(region) => this.onRegionChange(region)}
-              //   customMapStyle={MapStyle}
-              // >
-              //   <MapView.Marker coordinate={origin} title="Origin" />
-              //   <MapView.Marker coordinate={waypoint} title="Waypoint" />
-              //   <MapView.Marker coordinate={destination} title="Destination" />
-              //   <MapView.Polyline   coordinates={[
-              //   { latitude: 33.8704, longitude: -117.9242 },
-              //   { latitude: 33.995, longitude: -117.926 },
-              //   { latitude: 34.01, longitude: -118.11 },
-              // ]}
-              // strokeWidth={4}
-              // strokeColor="blue" />
+        {googleMapsLoaded && Platform.OS === "web" ? (
+          // <MapView
+          //   style={styles.map}
+          //   initialRegion={this.state.region}
+          //   region={this.state.region}
+          //   onRegionChange={(region) => this.onRegionChange(region)}
+          //   customMapStyle={MapStyle}
 
+          // >
+          //   <MapView.Marker coordinate={origin} title="Origin" />
+          //   <MapView.Marker coordinate={waypoint} title="Waypoint" />
+          //   <MapView.Marker coordinate={destination} title="Destination" />
+          //   <MapView.Polyline coordinates={[origin, destination]} strokeColor="blue" strokeWidth={5} />
 
-        
-              // </MapView>
-        
-          // <Marker position={[origin.latitude,origin.longitude]} title="Origin" />
-          //   <Marker position={[waypoint.latitude,waypoint.longitude]} title="Waypoint" />
-          //   <Marker position={[destination.latitude,destination.longitude]} title="Destination" /> 
+          // </MapView>
+
           <MapContainer
-        center={[33.9, -117.9]}
-        zoom={10}
-        style={{ height: "500px", width: "100%" }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-          <Marker position={[33.8704, -117.9242]} title="Origin" />
-          <Marker position={[33.995, -117.926]} title="Waypoint" />
-           <Marker position={[34.01, -118.11]} title="Destination" />
+            center={[33.9, -117.9]}
+            zoom={10}
+            style={{ height: "500px", width: "100%" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <Marker position={[33.8704, -117.9242]} title="Origin" />
+            <Marker position={[33.995, -117.926]} title="Waypoint" />
+            <Marker position={[34.01, -118.11]} title="Destination" />
 
-        {/* Render the route as a polyline */}
-        <Polyline positions={routeCoordinates} color="blue" weight={10} />
-      </MapContainer>
-    
-          ) : Platform.OS === "android" ? (
-            <MapViewMob
-              style={styles.map}
-              initialRegion={this.state.region}
-              region={this.state.region}
-              onRegionChange={(region) => this.onRegionChange(region)}
-              customMapStyle={MapStyle}
-            >
-             
-              <MarkerMob coordinate={origin} title="Origin" />
-              <MarkerMob coordinate={waypoint} title="Waypoint" />
-              <MarkerMob coordinate={destination} title="Destination" />
-              <MapViewDirectionsMob
-                origin={origin}
-                waypoints={[waypoint]}
-                destination={destination}
-                apikey={apiKey}
-                strokeWidth={4}
-                strokeColor="hotpink"
-              />
-            </MapViewMob>
-          ) : (
-            <Text>LOADING....</Text>
-          )}
-  
+            {/* Render the route as a polyline */}
+            <Polyline positions={routeCoordinates} color="blue" weight={5} />
+          </MapContainer>
+        ) : Platform.OS === "android" ? (
+          <MapViewMob
+            style={styles.map}
+            initialRegion={this.state.region}
+            region={this.state.region}
+            onRegionChange={(region) => this.onRegionChange(region)}
+            customMapStyle={MapStyle}
+          >
+            <MarkerMob coordinate={origin} title="Origin" />
+            <MarkerMob coordinate={waypoint} title="Waypoint" />
+            <MarkerMob coordinate={destination} title="Destination" />
+            <MapViewDirectionsMob
+              origin={origin}
+              waypoints={[waypoint]}
+              destination={destination}
+              apikey={apiKey}
+              strokeWidth={4}
+              strokeColor="hotpink"
+            />
+          </MapViewMob>
+        ) : (
+          <Text>LOADING....</Text>
+        )}
       </View>
     );
   }
