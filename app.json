@@ -15,15 +15,34 @@
       "**/*"
     ],
     "ios": {
+      "config": {
+        "googleMapsApiKey": "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+      },
       "supportsTablet": true
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+        }
+      },
+        "permissions": [
+          "ACCESS_COARSE_LOCATION",
+          "ACCESS_FINE_LOCATION",
+          "INTERNET",
+          "ACCESS_NETWORK_STATE",
+          "READ_GSERVICES",
+          "WRITE_EXTERNAL_STORAGE"
+        ],
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
+      "config": {
+        "googleMapsApiKey": "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+      },
       "favicon": "./src/assets/favicon.png"
     }
   }
