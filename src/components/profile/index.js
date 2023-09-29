@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Platform, Button } from 'react-native';
 import ErrorBoundary from '../errorBoundry';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import ShowMapScreen from './ShowMapComponent';
+
 
 
 const MainMapScreen = () => {
@@ -71,16 +71,15 @@ const MainMapScreen = () => {
         latitude: 33.869,
         longitude: -117.923,
       }, // Latitude and longitude for the destination marker
-      markers: newMarkers,
+      markers: [],
       googleMapsLoaded: false,
-    });
+    })
     
     return (
         <View style={styles.container}>
         <ErrorBoundary>
           <View style={styles.container}>
-          <ShowMapScreen stateOfMap={stateOfMap}></ShowMapScreen>
-          <TouchableOpacity style={styles.button} onPress={() => {setStateOfMap(...stateOfMap.markers = newMarkers)}}><Text>Generate Waypoints</Text></TouchableOpacity>
+          <ShowMapScreen stateOfMap={stateOfMap} onPress={() => { setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true});console.log("Modified state of map to ", stateOfMap)}}></ShowMapScreen>
           </View>
         </ErrorBoundary>
         </View>

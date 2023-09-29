@@ -43,15 +43,12 @@ const debounce = (func, delay) => {
 export default class ProfileScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = props.stateOfMap;
+    this.state = this.props.stateOfMap;
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
+    console.log("Props are ", this.props)
   }
 
-  componentDidMount() {
-    // Load Google Maps API and initialize the map
-    if (Platform.OS === "web") {
-      loadGoogleMapsAPI(() => {
-        this.setState({ googleMapsLoaded: true });
+  fetchRouteData() {
 
         // Define waypoints as latitude and longitude coordinates
         const origin = "33.8704,-117.9242"; // Replace with your origin coordinates
@@ -80,6 +77,23 @@ export default class ProfileScreen extends Component {
           .catch((error) => {
             console.error("Error fetching route:", error);
           });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps != this.props) {
+      console.log("New Props are ", this.props)
+      this.setState(this.props.stateOfMap);
+      this.fetchRouteData();
+    }
+    
+  }
+
+  componentDidMount() {
+    console.log("Component is mounted")
+    if (Platform.OS === "web") {
+      loadGoogleMapsAPI(() => {
+        this.setState({ googleMapsLoaded: true });
+        this.fetchRouteData();
       });
     }
   }
@@ -137,6 +151,7 @@ export default class ProfileScreen extends Component {
     console.log("Region changed:", region);
   };
 
+
   onPress = (event) => {
     console.log("Map pressed:", event.nativeEvent.coordinate);
   };
@@ -160,6 +175,8 @@ export default class ProfileScreen extends Component {
     } = this.state;
     return (
       <View style={styles.container}>
+        {console.log("Props are ", this.props)}
+        {console.log("State is ", this.state)}
         <ErrorBoundary>
           {googleMapsLoaded && Platform.OS === "web" ? (
             <View style={styles.container}>
@@ -178,7 +195,7 @@ export default class ProfileScreen extends Component {
                 <MapView.Marker coordinate={origin} title="Origin" />
                 <MapView.Marker coordinate={destination} title="Destination" />
 
-                { markers.map((marker, index) => (
+                { console.log("Markers are ", markers) || markers.map((marker, index) => (
                   <MapView.Marker
                     key={index}
                     coordinate={marker.latlng}
@@ -193,10 +210,11 @@ export default class ProfileScreen extends Component {
                       longitude: coord[1],
                     }))}
                     strokeWidth={4}
-                    strokeColor="grey"
+                    strokeColor="royalblue"
                   />
                 )}
               </MapView>
+              <TouchableOpacity onPress={this.props.onPress}><Text>Generate Waypoints</Text></TouchableOpacity>
             </View>
           ) : Platform.OS === "android" ? (
             <MapViewMob
