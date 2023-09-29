@@ -30,10 +30,21 @@ if (Platform.OS === "web") {
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
 
+// Create the debounce function
+const debounce = (func, delay) => {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+};
+
+
 export default class ProfileScreen extends Component {
   constructor(props) {
     super(props);
     this.state = props.stateOfMap;
+    this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
   }
 
   componentDidMount() {
@@ -73,6 +84,7 @@ export default class ProfileScreen extends Component {
     }
   }
 
+
   extractcoords(overviewPolyline) {
     try {
       if (
@@ -107,19 +119,19 @@ export default class ProfileScreen extends Component {
     }
   }
 
-  onRegionChange = (region) => {
-    {
-      const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
-      this.setState({
-        region: {
-          latitude,
-          longitude,
-          latitudeDelta,
-          longitudeDelta,
-        },
-      });
-    };
-  }
+  //  Create a debounced version of onRegionChange
+  debouncedOnRegionChange = debounce((newRegion) => {
+    // Check if the new region has valid latitude and longitude
+    if (
+      !isNaN(newRegion.latitude) &&
+      !isNaN(newRegion.longitude) &&
+      isFinite(newRegion.latitude) &&
+      isFinite(newRegion.longitude)
+    ) {
+      // Update the state only if the new region has valid coordinates
+      this.setState({ region: newRegion });
+    }
+  }, 10);
 
   onRegionChangeComplete = (region) => {
     console.log("Region changed:", region);
@@ -155,7 +167,7 @@ export default class ProfileScreen extends Component {
                 style={styles.map}
                 initialRegion={this.state.region}
                 region={this.state.region}
-                onRegionChange={(new_region) => {this.onRegionChange(new_region)}}
+                onRegionChange={(new_region) => {this.debouncedOnRegionChange(new_region)}}
                 onRegionChangeComplete={this.onRegionChangeComplete}
                 onPress={this.onPress}
                 onDoublePress={this.onDoublePress}
