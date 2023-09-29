@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { SafeAreaView, StyleSheet, Text } from 'react-native';
 
+import wayPointsData from './constant';
+
 
 export default class TestScreen extends Component{
 
@@ -8,6 +10,9 @@ export default class TestScreen extends Component{
         nearbyHubs : []
     }
 
+    generateWaypoints() {
+        
+    }
 
 
     componentDidMount(){
