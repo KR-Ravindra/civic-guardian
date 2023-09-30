@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Platform, Button } from 'react-native';
 import ErrorBoundary from '../errorBoundry';
 import ShowMapScreen from './ShowMapComponent';
-
-
+import getHubs from './GetHubs';
 
 const MainMapScreen = () => {
     const newMarkers = [
@@ -58,6 +57,8 @@ const MainMapScreen = () => {
         description: "Marker Description 5",
       },
     ];
+    const origin = { latitude: 33.8704, longitude: -117.9242 };
+    const destination = { latitude: 33.869, longitude: -117.923 };
     const [stateOfMap, setStateOfMap] = useState({
       coords: [],
       region: {
@@ -66,20 +67,27 @@ const MainMapScreen = () => {
         latitudeDelta: 0.01, // Adjust this value for zoom level
         longitudeDelta: 0.01, // Adjust this value for zoom level
       },
-      origin: { latitude: 33.8704, longitude: -117.9242 }, // Latitude and longitude for the origin marker
-      destination: {
-        latitude: 33.869,
-        longitude: -117.923,
-      }, // Latitude and longitude for the destination marker
+      origin: origin, // Latitude and longitude for the origin marker
+      destination: destination, // Latitude and longitude for the destination marker
       markers: [],
       googleMapsLoaded: false,
+      plot: {
+        draw: false,
+        origin: { latitude: origin.latitude, longitude: origin.longitude },
+        destination: { latitude: destination.latitude, longitude: destination.longitude },
+        waypoint: {latitude: 33.875, longitude: -117.926}
+      }
     })
     
     return (
         <View style={styles.container}>
         <ErrorBoundary>
           <View style={styles.container}>
-          <ShowMapScreen stateOfMap={stateOfMap} onPress={() => { setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true});console.log("Modified state of map to ", stateOfMap)}}></ShowMapScreen>
+          <ShowMapScreen 
+            stateOfMap={stateOfMap} 
+            onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true} );console.log("Modified state of map to ", stateOfMap)}}
+            onPressPlotter={() => { setStateOfMap({...stateOfMap,markers: getHubs(stateOfMap.region), googleMapsLoaded: true, plot: true} );console.log("Modified state of map to ", stateOfMap)}}
+             ></ShowMapScreen>
           </View>
         </ErrorBoundary>
         </View>

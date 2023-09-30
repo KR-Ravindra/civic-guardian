@@ -81,19 +81,22 @@ export default class ProfileScreen extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps != this.props) {
-      console.log("New Props are ", this.props)
+      console.log("Component Updated with props ", this.props)
       this.setState(this.props.stateOfMap);
+    }
+    if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw)
+    {
+      console.log("Plot Requested with props ", this.props)
       this.fetchRouteData();
     }
     
   }
 
   componentDidMount() {
-    console.log("Component is mounted")
+    console.log("Component is mounted with props ", this.props)
     if (Platform.OS === "web") {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
-        this.fetchRouteData();
       });
     }
   }
@@ -175,8 +178,6 @@ export default class ProfileScreen extends Component {
     } = this.state;
     return (
       <View style={styles.container}>
-        {console.log("Props are ", this.props)}
-        {console.log("State is ", this.state)}
         <ErrorBoundary>
           {googleMapsLoaded && Platform.OS === "web" ? (
             <View style={styles.container}>
@@ -195,7 +196,7 @@ export default class ProfileScreen extends Component {
                 <MapView.Marker coordinate={origin} title="Origin" />
                 <MapView.Marker coordinate={destination} title="Destination" />
 
-                { console.log("Markers are ", markers) || markers.map((marker, index) => (
+                { markers.map((marker, index) => (
                   <MapView.Marker
                     key={index}
                     coordinate={marker.latlng}
@@ -203,7 +204,7 @@ export default class ProfileScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                {console.log("Cords are", coords) || coords && (
+                {coords && (
                   <MapView.Polyline
                     coordinates={coords.map((coord) => ({
                       latitude: coord[0],
@@ -214,7 +215,8 @@ export default class ProfileScreen extends Component {
                   />
                 )}
               </MapView>
-              <TouchableOpacity onPress={this.props.onPress}><Text>Generate Waypoints</Text></TouchableOpacity>
+              <TouchableOpacity onPress={this.props.onPressMarkers}><Text>Generate Waypoints</Text></TouchableOpacity>
+              <TouchableOpacity onPress={this.props.onPressPlotter}><Text>Generate Way</Text></TouchableOpacity>
             </View>
           ) : Platform.OS === "android" ? (
             <MapViewMob
