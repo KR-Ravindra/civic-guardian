@@ -48,12 +48,7 @@ export default class ProfileScreen extends Component {
     console.log("Props are ", this.props)
   }
 
-  fetchRouteData() {
-
-        // Define waypoints as latitude and longitude coordinates
-        const origin = "33.8704,-117.9242"; // Replace with your origin coordinates
-        const waypoint = "33.872,-117.921"; // Replace with your waypoint coordinates
-        const destination = "33.869,-117.923"; // Replace with your destination coordinates
+  fetchRouteData(origin, waypoint, destination) {
 
         // Update the proxy URL to "CORS Anywhere"
         const proxyUrl = "https://cors-anywhere.herokuapp.com/";
@@ -87,7 +82,9 @@ export default class ProfileScreen extends Component {
     if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw)
     {
       console.log("Plot Requested with props ", this.props)
-      this.fetchRouteData();
+      this.fetchRouteData(this.props.stateOfMap.plot.origin.latitude+','+this.props.stateOfMap.plot.origin.longitude, 
+      this.props.stateOfMap.plot.waypoint.latitude+','+this.props.stateOfMap.plot.waypoint.longitude, 
+      this.props.stateOfMap.plot.origin.latitude+','+this.props.stateOfMap.plot.destination.longitude);
     }
     
   }
@@ -192,6 +189,7 @@ export default class ProfileScreen extends Component {
                 onPanDrag={this.onPanDrag}
                 zoomEnabled={true}
                 zoomControlEnabled={true}
+                mapType="terrain"
               >
                 <MapView.Marker coordinate={origin} title="Origin" />
                 <MapView.Marker coordinate={destination} title="Destination" />
