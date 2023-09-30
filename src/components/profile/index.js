@@ -58,12 +58,12 @@ const MainMapScreen = () => {
       },
     ];
     const origin = { latitude: 33.8365932, longitude: -117.9143012 };
-    const destination = { latitude: 33.8574514, longitude: -117.9232469 };
+    const destination = { latitude: 33.8688483, longitude: -117.922873 };
     const [stateOfMap, setStateOfMap] = useState({
       coords: [],
       region: {
-        latitude: origin.latitude, // Latitude for fullerton
-        longitude: origin.longitude, // Longitude for fullerton
+        latitude: destination.latitude, // Latitude for fullerton
+        longitude: destination.longitude, // Longitude for fullerton
         latitudeDelta: 0.05, // Adjust this value for zoom level
         longitudeDelta: 0.05, // Adjust this value for zoom level
       },
@@ -75,7 +75,7 @@ const MainMapScreen = () => {
         draw: false,
         origin: { latitude: origin.latitude, longitude: origin.longitude },
         destination: { latitude: destination.latitude, longitude: destination.longitude },
-        waypoint: {latitude: 33.8395403, longitude: -117.8951055}
+        waypoint: {latitude: 33.8586294, longitude: -117.9192771}
       }
     })
     

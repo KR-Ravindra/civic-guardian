@@ -50,6 +50,8 @@ export default class ProfileScreen extends Component {
 
   fetchRouteData(origin, waypoint, destination) {
 
+        console.log("Origin, Waypoint, Destination", origin, waypoint, destination)
+
         // Update the proxy URL to "CORS Anywhere"
         const proxyUrl = "https://cors-anywhere.herokuapp.com/";
         // Construct the URL for the Google Directions API request
@@ -63,6 +65,7 @@ export default class ProfileScreen extends Component {
             const parsedData = JSON.parse(data); // Parse the JSON string into an object
             if (parsedData.routes && parsedData.routes.length > 0) {
               // Extract route coordinates from the parsed data
+              console.log("Parsed Data from api of routes are ",parsedData.routes)  
               const coords = this.extractcoords(
                 parsedData.routes[0].overview_polyline,
               );
@@ -202,7 +205,7 @@ export default class ProfileScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                {coords && (
+                { console.log("Coords are" , coords) || coords && (
                   <MapView.Polyline
                     coordinates={coords.map((coord) => ({
                       latitude: coord[0],
