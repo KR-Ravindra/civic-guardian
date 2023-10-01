@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Platform, Button } from 'react-native';
 import ErrorBoundary from '../errorBoundry';
 import ShowMapScreen from './ShowMapComponent';
-import getHubs from './GetHubs';
+import getHubs from '../../apis/GetHubs';
 
 const MainMapScreen = () => {
     const newMarkers = [
