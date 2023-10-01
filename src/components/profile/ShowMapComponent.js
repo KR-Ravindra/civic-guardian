@@ -34,9 +34,14 @@ const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API ke
 const debounce = (func, delay) => {
   let timer;
   return function (...args) {
+    try {
     clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
-  };
+    timer = setTimeout(() => {if(typeof func == "function") {func(...args)}}, delay);
+
+    } catch (error) {
+      console.log("Error in debounce", error)
+    }
+};
 };
 
 
@@ -48,10 +53,12 @@ export default class ProfileScreen extends Component {
     console.log("Props are ", this.props)
   }
 
-  fetchRouteData(origin, waypoint, destination) {
+  // fetchRouteData(origin, waypoint, destination) {
+  fetchRouteData(originLatLong, waypointLatLong, destinationLatLong) {
 
-        console.log("Origin, Waypoint, Destination", origin, waypoint, destination)
-
+        const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
+        const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
+        const waypoint = `${waypointLatLong.latitude},${waypointLatLong.longitude}`;
         // Update the proxy URL to "CORS Anywhere"
         const proxyUrl = "https://cors-anywhere.herokuapp.com/";
         // Construct the URL for the Google Directions API request
@@ -65,7 +72,6 @@ export default class ProfileScreen extends Component {
             const parsedData = JSON.parse(data); // Parse the JSON string into an object
             if (parsedData.routes && parsedData.routes.length > 0) {
               // Extract route coordinates from the parsed data
-              console.log("Parsed Data from api of routes are ",parsedData.routes)  
               const coords = this.extractcoords(
                 parsedData.routes[0].overview_polyline,
               );
@@ -85,9 +91,10 @@ export default class ProfileScreen extends Component {
     if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw)
     {
       console.log("Plot Requested with props ", this.props)
-      this.fetchRouteData(this.props.stateOfMap.plot.origin.latitude+','+this.props.stateOfMap.plot.origin.longitude, 
-      this.props.stateOfMap.plot.waypoint.latitude+','+this.props.stateOfMap.plot.waypoint.longitude, 
-      this.props.stateOfMap.plot.origin.latitude+','+this.props.stateOfMap.plot.destination.longitude);
+      if (Platform.OS === "web") {
+      this.fetchRouteData(this.props.stateOfMap.plot.origin, this.props.stateOfMap.plot.waypoint, this.props.stateOfMap.plot.destination);
+      // this.fetchRouteData()
+      }
     }
     
   }
@@ -175,6 +182,7 @@ export default class ProfileScreen extends Component {
       destination,
       markers,
       googleMapsLoaded,
+      plot
     } = this.state;
     return (
       <View style={styles.container}>
@@ -220,23 +228,40 @@ export default class ProfileScreen extends Component {
               <TouchableOpacity onPress={this.props.onPressPlotter}><Text>Generate Way</Text></TouchableOpacity>
             </View>
           ) : Platform.OS === "android" ? (
+            <View style={styles.container}>
             <MapViewMob
               style={styles.map}
               initialRegion={this.state.region}
               region={this.state.region}
-              onRegionChange={(region) => this.onRegionChange(region)}
+              onRegionChange={(new_region) => {this.debouncedOnRegionChange(new_region)}}
+              mapType="terrain"
               customMapStyle={MapStyle}
             >
               <MarkerMob coordinate={origin} title="Origin" />
               <MarkerMob coordinate={destination} title="Destination" />
-              <MapViewDirectionsMob
-                origin={origin}
-                destination={destination}
-                apikey={apiKey}
-                strokeWidth={4}
-                strokeColor="hotpink"
-              />
+
+              { console.log("Markers are " ,markers) || markers.map((marker, index) => (
+                  <MarkerMob
+                    key={index}
+                    coordinate={marker.latlng}
+                    title={marker.title}
+                    description={marker.description}
+                  />
+                ))}
+                { plot.draw && (
+                    <MapViewDirectionsMob
+                      origin={origin}
+                      waypoints={[{latitude: plot.waypoint.latitude, longitude: plot.waypoint.longitude}]}
+                      destination={destination}
+                      apikey={apiKey}
+                      strokeWidth={4}
+                      strokeColor="hotpink"
+                    />
+                  )}
             </MapViewMob>
+            <TouchableOpacity onPress={this.props.onPressMarkers}><Text>Generate Waypoints</Text></TouchableOpacity>
+            <TouchableOpacity onPress={this.props.onPressPlotter}><Text>Generate Way</Text></TouchableOpacity>
+            </View>
           ) : (
             <Text>LOADING....</Text>
           )}

@@ -5,7 +5,7 @@ import ShowMapScreen from './ShowMapComponent';
 import getHubs from '../../apis/GetHubs';
 
 const MainMapScreen = () => {
-    const newMarkers = [
+    const dummyMarkers = [
       {
         latlng: {
           latitude: 33.8704,
@@ -58,7 +58,7 @@ const MainMapScreen = () => {
       },
     ];
     const origin = { latitude: 33.8365932, longitude: -117.9143012 };
-    const destination = { latitude: 33.8688483, longitude: -117.922873 };
+    const destination = { latitude: 33.8736902, longitude: -117.923685 };
     const [stateOfMap, setStateOfMap] = useState({
       coords: [],
       region: {
@@ -78,17 +78,18 @@ const MainMapScreen = () => {
         waypoint: {latitude: 33.8586294, longitude: -117.9192771}
       }
     })
+    const newMarkers = getHubs(stateOfMap.region)
     
     return (
         <View style={styles.container}>
-          {console.log("Predefined markers are ", newMarkers)}
+          {console.log("Predefined markers are ", dummyMarkers)}
           {console.log("Function derived markers are ", getHubs(stateOfMap.region))}
         <ErrorBoundary>
           <View style={styles.container}>
           <ShowMapScreen 
             stateOfMap={stateOfMap} 
-            onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true} );console.log("Modified state of map to ", stateOfMap)}}
-            onPressPlotter={() => { setStateOfMap({...stateOfMap,markers: getHubs(stateOfMap.region), googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw) }} );console.log("Modified state of map to ", stateOfMap)}}
+            onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: dummyMarkers, googleMapsLoaded: true} );console.log("Modified state of map to ", stateOfMap)}}
+            onPressPlotter={() => { console.log("Markers are" , newMarkers);setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw) }} );console.log("Modified state of map to ", stateOfMap)}}
              ></ShowMapScreen>
           </View>
         </ErrorBoundary>
