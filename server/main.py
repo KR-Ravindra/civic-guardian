@@ -1,11 +1,25 @@
 from fastapi import FastAPI, Request
+import aiohttp
+import asyncio
+
 import pprint
 app = FastAPI()
 
 
 async def get_distance(from_node, to_node):
-    distance = abs(from_node["latlng"]["latitude"] - to_node["latlng"]["latitude"]) + abs(from_node["latlng"]["longitude"] - to_node["latlng"]["longitude"])
-    return int(distance * 1000)
+    origin = f"{from_node['latlng']['latitude']},{from_node['latlng']['longitude']}"
+    destination = f"{to_node['latlng']['latitude']},{to_node['latlng']['longitude']}"
+
+    api_key = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"
+
+    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins={origin}&destinations={destination}&mode=walking&key={api_key}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.json()
+
+    distance = data["rows"][0]["elements"][0]["distance"]["value"]
+    return distance
 
 async def build_graph(data):
     graph = [[0 for _ in range(len(data))] for _ in range(len(data))]
