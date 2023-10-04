@@ -2,9 +2,10 @@
 City Navigation and Emergency Route Planning Tool
 
 
-## Strictly no cycles in the obtained graph
-
-- Can try with negative and postive cycles as feature enhancements :D
+## To Run
+```bash
+docker-compose up 
+```
 
 
 ## Workflow

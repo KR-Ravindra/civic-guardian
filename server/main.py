@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 import aiohttp
 import asyncio
+import random
 
 import pprint
 app = FastAPI()
@@ -17,8 +18,14 @@ async def get_distance(from_node, to_node):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             data = await response.json()
-
-    distance = data["rows"][0]["elements"][0]["distance"]["value"]
+            print(f"Recieved json response as {data}")
+    try:
+        distance = data["rows"][0]["elements"][0]["distance"]["value"]
+    except KeyError as e:
+        print(e)
+        print(data)
+        distance = 1
+    
     return distance
 
 async def build_graph(data):
@@ -28,7 +35,7 @@ async def build_graph(data):
             if index == inner_index:
                 graph[index][inner_index] = {"value": 0, "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title']}
             else:
-                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node), "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title']}
+                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node), "from": each_node['title'], "to": each_inner_node['title'], "via": ""}
     return graph
 
 async def floyd_warshall(data):
@@ -51,13 +58,20 @@ async def just_floyd_warshall(graph):
     return graph
 
 async def best_node(data):
+    sources = []
     graph = await floyd_warshall(data)
     source = data[-2]["title"]
     destination = data[-1]["title"]
     for _, each_node in enumerate(graph):
         for _, each_inner_node in enumerate(each_node):
             if each_inner_node["from"] == source and each_inner_node["to"] == destination:
-                return each_inner_node
+                # if each_inner_node["via"] == destination:
+                #     each_inner_node["via"] = random.choice(sources)
+                #     print(f"Randomly selected {each_inner_node['via']} as via")
+                #     sources.remove(each_inner_node["via"])
+                    return each_inner_node
+            # else:
+            #     sources.append(each_inner_node["from"])
     return "No Path found"
     
 @app.get('/test')
@@ -75,7 +89,7 @@ async def test():
   {'from': 'C', 'to': 'C', 'value': 0, 'via': 'C'},
   {'from': 'C', 'to': 'D', 'value': 1, 'via': ''}],
  [{'from': 'D', 'to': 'A', 'value': 99999, 'via': ''},
-  {'from': 'D', 'to': 'B', 'value': 99999, 'via': ''},
+  {'from': 'D', 'to': 'B', 'value': 99999, 'via': ''},  
   {'from': 'D', 'to': 'C', 'value': 99999, 'via': ''},
   {'from': 'D', 'to': 'D', 'value': 0, 'via': 'D'}]]
     result = await just_floyd_warshall(graph)
