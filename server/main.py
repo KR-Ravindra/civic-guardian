@@ -1,10 +1,22 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 import aiohttp
 import asyncio
 import random
-
+import logging 
 import pprint
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+   
+logger = logging.getLogger(__name__) 
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d:%m:%Y %H:%M:%S:%f')
+
 
 
 async def get_distance(from_node, to_node):
@@ -18,7 +30,6 @@ async def get_distance(from_node, to_node):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             data = await response.json()
-            print(f"Recieved json response as {data}")
     try:
         distance = data["rows"][0]["elements"][0]["distance"]["value"]
     except KeyError as e:
@@ -33,9 +44,9 @@ async def build_graph(data):
     for index, each_node in enumerate(data):
         for inner_index, each_inner_node in enumerate(data):
             if index == inner_index:
-                graph[index][inner_index] = {"value": 0, "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title']}
+                graph[index][inner_index] = {"value": 0, "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title'], "latlng": each_node['latlng']}
             else:
-                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node), "from": each_node['title'], "to": each_inner_node['title'], "via": ""}
+                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node), "from": each_node['title'], "to": each_inner_node['title'], "via": "", "latlng": each_node['latlng']}
     return graph
 
 async def floyd_warshall(data):
@@ -58,7 +69,7 @@ async def just_floyd_warshall(graph):
     return graph
 
 async def best_node(data):
-    sources = []
+    # sources = []
     graph = await floyd_warshall(data)
     source = data[-2]["title"]
     destination = data[-1]["title"]
@@ -102,13 +113,16 @@ async def root():
 @app.post('/getBestWayPoint')
 async def get_best_way_point(request: Request):
     result = await request.json()
+    logger.info(f" Got Paylßoad")
     best_way_point = await best_node(result['data'])
     return best_way_point
 
 @app.post('/getFWMatrix')
 async def get_fw_matrix(request: Request):
     result = await request.json()
+    logger.info(f" Got Payload {result = }")
     fw_matrix = await floyd_warshall(result['data'])
+    logger.info(f"{fw_matrix = }")
     return fw_matrix
 
 if __name__ == '__main__':

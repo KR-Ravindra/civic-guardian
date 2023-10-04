@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Platform, Button } from 'react-native';
 import ErrorBoundary from '../errorBoundry';
 import ShowMapScreen from './ShowMapComponent';
 import getHubs from '../../apis/GetHubs';
+import floydWarshall from '../../apis/FloydWarshall';
 
 const MainMapScreen = () => {
     const dummyMarkers = [
@@ -78,12 +79,15 @@ const MainMapScreen = () => {
         waypoint: {latitude: 33.8586294, longitude: -117.9192771}
       }
     })
-    const newMarkers = getHubs(stateOfMap.region)
-    
+    const newMarkers = getHubs(stateOfMap.region);
+    console.log("New markers just generated are", newMarkers);
+
+
+
     return (
         <View style={styles.container}>
           {console.log("Predefined markers are ", dummyMarkers)}
-          {console.log("Function derived markers are ", getHubs(stateOfMap.region))}
+          {console.log("Function derived markers are ", newMarkers)}
         <ErrorBoundary>
           <View style={styles.container}>
           <ShowMapScreen 

@@ -11,6 +11,7 @@ import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 // import MapView, { Marker, Polyline } from "react-native-maps";
+import floydWarshall from "../../apis/FloydWarshall";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -55,6 +56,8 @@ export default class ProfileScreen extends Component {
 
   // fetchRouteData(origin, waypoint, destination) {
   fetchRouteData(originLatLong, waypointLatLong, destinationLatLong) {
+        console.log("Function is called")
+        console.log("Waypoint is", waypointLatLong)
 
         const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
         const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
@@ -92,8 +95,14 @@ export default class ProfileScreen extends Component {
     {
       console.log("Plot Requested with props ", this.props)
       if (Platform.OS === "web") {
-      this.fetchRouteData(this.props.stateOfMap.plot.origin, this.props.stateOfMap.plot.waypoint, this.props.stateOfMap.plot.destination);
-      // this.fetchRouteData()
+        floydWarshall(this.props.stateOfMap.markers).then((best_waypoint) => {
+          console.log("Best waypoint is", best_waypoint);
+          if (best_waypoint) {
+            this.fetchRouteData(this.props.stateOfMap.plot.origin, best_waypoint, this.props.stateOfMap.plot.destination);
+          }
+        }).catch((error) => {
+          console.error("Error:", error);
+        });
       }
     }
     
