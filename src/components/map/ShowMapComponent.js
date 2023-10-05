@@ -5,6 +5,7 @@ import {
   View,
   Platform,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
@@ -17,13 +18,12 @@ let MapViewMob, MarkerMob, MapViewDirectionsMob;
 if (Platform.OS === "android") {
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
-  MapViewDirectionsMob =
-    require("react-native-maps-directions").default;
+  MapViewDirectionsMob = require("react-native-maps-directions").default;
 }
-let MapView
+let MapView;
 
 if (Platform.OS === "web") {
-  MapView = require('@preflower/react-native-web-maps').default;
+  MapView = require("@preflower/react-native-web-maps").default;
 }
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
@@ -33,87 +33,92 @@ const debounce = (func, delay) => {
   let timer;
   return function (...args) {
     try {
-    clearTimeout(timer);
-    timer = setTimeout(() => {if(typeof func == "function") {func(...args)}}, delay);
-
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (typeof func == "function") {
+          func(...args);
+        }
+      }, delay);
     } catch (error) {
-      console.log("Error in debounce", error)
+      console.log("Error in debounce", error);
     }
+  };
 };
-};
-
 
 export default class MapScreen extends Component {
   constructor(props) {
     super(props);
     this.state = this.props.stateOfMap;
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
-    console.log("Props are ", this.props)
+    console.log("Props are ", this.props);
   }
 
   // fetchRouteData(origin, waypoint, destination) {
   fetchRouteData(originLatLong, waypointLatLong, destinationLatLong) {
-        console.log("Function is called")
-        console.log("Waypoint is", waypointLatLong)
+    console.log("Function is called");
+    console.log("Waypoint is", waypointLatLong);
 
-        const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
-        const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
-        const waypoint = `${waypointLatLong.latitude},${waypointLatLong.longitude}`;
-        // Update the proxy URL to "CORS Anywhere"
-        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-        // Construct the URL for the Google Directions API request
-        const apiUrl = `${proxyUrl}https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
-        //  const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+    const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
+    const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
+    const waypoint = `${waypointLatLong.latitude},${waypointLatLong.longitude}`;
+    // Update the proxy URL to "CORS Anywhere"
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    // Construct the URL for the Google Directions API request
+    const apiUrl = `${proxyUrl}https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
+    //  const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
 
-        // Make an API request to the Google Directions API
-        fetch(apiUrl)
-          .then((response) => response.text()) // Get the response body as text
-          .then((data) => {
-            const parsedData = JSON.parse(data); // Parse the JSON string into an object
-            if (parsedData.routes && parsedData.routes.length > 0) {
-              // Extract route coordinates from the parsed data
-              const coords = this.extractcoords(
-                parsedData.routes[0].overview_polyline,
-              );
-              this.setState({ coords });
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching route:", error);
-          });
+    // Make an API request to the Google Directions API
+    fetch(apiUrl)
+      .then((response) => response.text()) // Get the response body as text
+      .then((data) => {
+        const parsedData = JSON.parse(data); // Parse the JSON string into an object
+        if (parsedData.routes && parsedData.routes.length > 0) {
+          // Extract route coordinates from the parsed data
+          const coords = this.extractcoords(
+            parsedData.routes[0].overview_polyline
+          );
+          this.setState({ coords });
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching route:", error);
+      });
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps != this.props) {
-      console.log("Component Updated with props ", this.props)
+      console.log("Component Updated with props ", this.props);
       this.setState(this.props.stateOfMap);
     }
-    if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw)
-    {
-      console.log("Plot Requested with props ", this.props)
+    if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw) {
+      console.log("Plot Requested with props ", this.props);
       if (Platform.OS === "web") {
-        floydWarshall(this.props.stateOfMap.markers).then((best_waypoint) => {
-          console.log("Best waypoint is", best_waypoint);
-          if (best_waypoint) {
-            this.fetchRouteData(this.props.stateOfMap.plot.origin, best_waypoint, this.props.stateOfMap.plot.destination);
-          }
-        }).catch((error) => {
-          console.error("Error:", error);
-        });
+        floydWarshall(this.props.stateOfMap.markers)
+          .then((best_waypoint) => {
+            console.log("Best waypoint is", best_waypoint);
+            if (best_waypoint) {
+              this.fetchRouteData(
+                this.props.stateOfMap.plot.origin,
+                best_waypoint,
+                this.props.stateOfMap.plot.destination
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       }
     }
-    
   }
 
   componentDidMount() {
-    console.log("Component is mounted with props ", this.props)
+    console.log("Component is mounted with props ", this.props);
     if (Platform.OS === "web") {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
       });
     }
   }
-
 
   extractcoords(overviewPolyline) {
     try {
@@ -167,7 +172,6 @@ export default class MapScreen extends Component {
     console.log("Region changed:", region);
   };
 
-
   onPress = (event) => {
     console.log("Map pressed:", event.nativeEvent.coordinate);
   };
@@ -188,8 +192,10 @@ export default class MapScreen extends Component {
       destination,
       markers,
       googleMapsLoaded,
-      plot
+      plot,
     } = this.state;
+    // Import images with Expo's asset management
+    const custom_pin = require("../../assets/custom_image.png");
     return (
       <View style={styles.container}>
         <ErrorBoundary>
@@ -199,7 +205,9 @@ export default class MapScreen extends Component {
                 style={styles.map}
                 initialRegion={this.state.region}
                 region={this.state.region}
-                onRegionChange={(new_region) => {this.debouncedOnRegionChange(new_region)}}
+                onRegionChange={(new_region) => {
+                  this.debouncedOnRegionChange(new_region);
+                }}
                 onRegionChangeComplete={this.onRegionChangeComplete}
                 onPress={this.onPress}
                 onDoublePress={this.onDoublePress}
@@ -208,10 +216,28 @@ export default class MapScreen extends Component {
                 zoomControlEnabled={true}
                 mapType="terrain"
               >
-                <MapView.Marker coordinate={origin} title="Origin" />
-                <MapView.Marker coordinate={destination} title="Destination" />
+                <MapView.Marker coordinate={origin} title="Origin">
+                  <View style={styles.markerContainer}>
+                    <img
+                      source={custom_pin}
+                      style={styles.markerImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                </MapView.Marker>
 
-                { markers.map((marker, index) => (
+                <MapView.Marker coordinate={destination} title="Destination">
+                  <View style={styles.markerContainer}>
+                    <img
+                      source={custom_pin}
+                      style={styles.markerImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                </MapView.Marker>
+                 
+
+                {markers.map((marker, index) => (
                   <MapView.Marker
                     key={index}
                     coordinate={marker.latlng}
@@ -219,54 +245,93 @@ export default class MapScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                { console.log("Coords are" , coords) || coords && (
-                  <MapView.Polyline
-                    coordinates={coords.map((coord) => ({
-                      latitude: coord[0],
-                      longitude: coord[1],
-                    }))}
-                    strokeWidth={4}
-                    strokeColor="royalblue"
-                  />
-                )}
+                {console.log("Coords are", coords) ||
+                  (coords && (
+                    <MapView.Polyline
+                      coordinates={coords.map((coord) => ({
+                        latitude: coord[0],
+                        longitude: coord[1],
+                      }))}
+                      strokeWidth={4}
+                      strokeColor="royalblue"
+                    />
+                  ))}
               </MapView>
-              <TouchableOpacity onPress={this.props.onPressMarkers}><Text>Generate Waypoints</Text></TouchableOpacity>
-              <TouchableOpacity onPress={this.props.onPressPlotter}><Text>Generate Way</Text></TouchableOpacity>
+              <TouchableOpacity onPress={this.props.onPressMarkers}>
+                <Text>Generate Waypoints</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this.props.onPressPlotter}>
+                <Text>Generate Way</Text>
+              </TouchableOpacity>
             </View>
           ) : Platform.OS === "android" ? (
             <View style={styles.container}>
-            <MapViewMob
-              style={styles.map}
-              initialRegion={this.state.region}
-              region={this.state.region}
-              onRegionChange={(new_region) => {this.debouncedOnRegionChange(new_region)}}
-              mapType="terrain"
-              customMapStyle={MapStyle}
-            >
-              <MarkerMob coordinate={origin} title="Origin" />
-              <MarkerMob coordinate={destination} title="Destination" />
-
-              { console.log("Markers are " ,markers) || markers.map((marker, index) => (
-                  <MarkerMob
-                    key={index}
-                    coordinate={marker.latlng}
-                    title={marker.title}
-                    description={marker.description}
+              <MapViewMob
+                style={styles.map}
+                initialRegion={this.state.region}
+                region={this.state.region}
+                onRegionChange={(new_region) => {
+                  this.debouncedOnRegionChange(new_region);
+                }}
+                mapType="terrain"
+                customMapStyle={MapStyle}
+              >
+                <MarkerMob
+                  coordinate={origin}
+                  title="Origin">
+                  <View style={styles.markerContainer}>
+                  <Image
+                    source={custom_pin}
+                    style={styles.markerImage}
+                    resizeMode="contain"
                   />
-                ))}
-                { plot.draw && (
-                    <MapViewDirectionsMob
-                      origin={origin}
-                      waypoints={[{latitude: plot.waypoint.latitude, longitude: plot.waypoint.longitude}]}
-                      destination={destination}
-                      apikey={apiKey}
-                      strokeWidth={4}
-                      strokeColor="hotpink"
+                </View>
+                </MarkerMob>
+                <MarkerMob
+                  coordinate={destination}
+                  title="Destination"
+                  >
+                  <View style={styles.markerContainer}>
+                  <Image
+                    source={custom_pin}
+                    style={styles.markerImage}
+                    resizeMode="contain"
+                  />
+                </View>
+                </MarkerMob>
+             
+
+                {console.log("Markers are ", markers) ||
+                  markers.map((marker, index) => (
+                    <MarkerMob
+                      key={index}
+                      coordinate={marker.latlng}
+                      title={marker.title}
+                      description={marker.description}
                     />
-                  )}
-            </MapViewMob>
-            <TouchableOpacity onPress={this.props.onPressMarkers}><Text>Generate Waypoints</Text></TouchableOpacity>
-            <TouchableOpacity onPress={this.props.onPressPlotter}><Text>Generate Way</Text></TouchableOpacity>
+                  ))}
+                {plot.draw && (
+                  <MapViewDirectionsMob
+                    origin={origin}
+                    waypoints={[
+                      {
+                        latitude: plot.waypoint.latitude,
+                        longitude: plot.waypoint.longitude,
+                      },
+                    ]}
+                    destination={destination}
+                    apikey={apiKey}
+                    strokeWidth={4}
+                    strokeColor="hotpink"
+                  />
+                )}
+              </MapViewMob>
+              <TouchableOpacity onPress={this.props.onPressMarkers}>
+                <Text>Generate Waypoints</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this.props.onPressPlotter}>
+                <Text>Generate Way</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <Text>LOADING....</Text>
@@ -283,5 +348,14 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  markerContainer: {
+    width: 40, // Set the desired width
+    height: 40, // Set the desired height
+  },
+  markerImage: {
+    flex: 1,
+    width: undefined, // This makes sure the width is set according to the parent container
+    height: undefined, // This makes sure the height is set according to the parent container
   },
 });
