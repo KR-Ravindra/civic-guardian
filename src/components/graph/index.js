@@ -217,8 +217,8 @@ const GraphScreen = () => {
         <View style={styles.graphFrame}>
           <GraphMob
             data={graph}
-            onLoad={() => setLoading(true)}
-            ref={visNetworkRef}
+            // onLoad={() => setLoading(true)}
+            // ref={visNetworkRef}
           />
         </View>
       ) : (
