@@ -59,6 +59,7 @@ async def floyd_warshall(data, source, destination):
                 if graph[i][j]["value"] > graph[i][k]["value"] + graph[k][j]["value"]:
                     graph[i][j]["value"] = graph[i][k]["value"] + graph[k][j]["value"]
                     graph[i][j]["via"] = graph[k][j]["from"]
+                    graph[i][j]["latlng"] = graph[k][j]["latlng"]
     return graph
 
 async def just_floyd_warshall(graph, source, destination):
