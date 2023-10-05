@@ -26,6 +26,9 @@ async function floydWarshall(nodes) {
         console.log("Data from backend :", data.latlng);
         return data.latlng;
     })
+    .catch(error => {
+        console.log("Error from backend :", error);
+    });
 }
 
 export default floydWarshall;
