@@ -18,6 +18,7 @@ function getHubs(current_location)  {
     })
     .then((data) => {
         data.results.forEach((object, index) => {
+          console.log("Object is", object)
           if (index < 5) {
           hub.push({
             latlng: {
@@ -26,6 +27,7 @@ function getHubs(current_location)  {
             },
             title: object.name,
             description: object.types[0],
+            id: index+1
           }); 
         }
         });
