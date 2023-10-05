@@ -26,29 +26,74 @@ const GraphScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const options = {
-    interaction: {
+    interaction:{
       selectable: true,
-      hover: true,
+      hover: true
     },
     autoResize: true,
     layout: {
-      hierarchical: false,
+      hierarchical: false
     },
     edges: {
       color: "black",
       width: 1,
-      arrows: "to;from",
+      arrows: 'to;from',
       dashes: false,
       smooth: {
         type: "dynamic",
         forceDirection: "horizontal",
-        roundness: 0.5,
+        roundness: 0.5
       },
       shadow: {
-        enabled: true,
+        enabled: true
+      }
+    },
+    nodes: {
+      shape: "ellipse",
+      size: 50,
+      borderWidth: 5,
+      color: {
+        border: "red",
+        background: "white",
+      },
+      font: {
+        size: 16
       },
     },
-  };
+    height: "800px",
+    width: "1000px",
+    physics: {
+      forceAtlas2Based: {
+        gravitationalConstant: -50,
+        centralGravity: 0.001,
+        springLength: 200,
+        springConstant: 0.08
+      },
+      maxVelocity: 50,
+      solver: "forceAtlas2Based",
+      timestep: 0.35,
+      stabilization: {
+        enabled: false,
+        iterations: 1000,
+        updateInterval: 2
+      }
+    },
+    groups: {
+      green: {
+        color: {
+          border: "green",
+          background: "green",
+          highlight: {
+            border: "green",
+            background: "green"
+          }
+        },
+        font: {
+          color: "white"
+        }
+      }
+    }
+  }
 
   const graph = {
     edges: [
@@ -139,15 +184,15 @@ const GraphScreen = () => {
     setIsButtonDisabled(true);
   };
 
-  useEffect(() => {
-    if (loading && visNetworkRef.current) {
-      const subscription = visNetworkRef.current.addEventListener(
-        "click",
-        (event) => console.log(JSON.stringify(event, null, 2))
-      );
-      return () => subscription.remove();
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   if (loading && visNetworkRef.current) {
+  //     const subscription = visNetworkRef.current.addEventListener(
+  //       "click",
+  //       (event) => console.log(JSON.stringify(event, null, 2))
+  //     );
+  //     return () => subscription.remove();
+  //   }
+  // }, [loading]);
 
   return (
     <View style={styles.container}>
