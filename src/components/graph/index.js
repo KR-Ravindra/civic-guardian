@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -21,9 +21,7 @@ if (Platform.OS === "android") {
 }
 
 const GraphScreen = () => {
-  const visNetworkRef = useRef();
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const options = {
     interaction:{
@@ -60,8 +58,8 @@ const GraphScreen = () => {
         size: 16
       },
     },
-    height: "800px",
-    width: "1000px",
+    height: '100%',
+    width: '100%',
     physics: {
       forceAtlas2Based: {
         gravitationalConstant: -50,
@@ -184,47 +182,9 @@ const GraphScreen = () => {
     setIsButtonDisabled(true);
   };
 
-  // useEffect(() => {
-  //   if (loading && visNetworkRef.current) {
-  //     const subscription = visNetworkRef.current.addEventListener(
-  //       "click",
-  //       (event) => console.log(JSON.stringify(event, null, 2))
-  //     );
-  //     return () => subscription.remove();
-  //   }
-  // }, [loading]);
 
   return (
     <View style={styles.container}>
-      {Platform.OS === "web" ? (
-        <ErrorBoundary>
-          <View style={styles.graphFrame}>
-            <GraphWeb
-              graph={graph}
-              options={options}
-              events={{
-                configure: function (event, properties) {
-                  properties.options.animation = {
-                    duration: 1000,
-                    easingFunction: "easeInOutQuad",
-                  };
-                },
-              }}
-            />
-          </View>
-        </ErrorBoundary>
-      ) : Platform.OS === "android" ? (
-        <View style={styles.graphFrame}>
-          <GraphMob
-            data={graph}
-            // onLoad={() => setLoading(true)}
-            // ref={visNetworkRef}
-          />
-        </View>
-      ) : (
-        <Text>LOADING....</Text>
-      )}
-
       {!isButtonDisabled && (
         <TouchableOpacity style={styles.button} onPress={handleButtonClick}>
           <View style={{ flexDirection: "row" }}>
@@ -251,19 +211,40 @@ const GraphScreen = () => {
           </View>
         </TouchableOpacity>
       )}
+      {Platform.OS === "web" ? (
+        <ErrorBoundary>
+          <View style={styles.container}>
+            <GraphWeb
+              graph={graph}
+              options={options}
+              events={{
+                configure: function (event, properties) {
+                  properties.options.animation = {
+                    duration: 1000,
+                    easingFunction: "easeInOutQuad",
+                  };
+                },
+              }}
+            />
+          </View>
+        </ErrorBoundary>
+      ) : Platform.OS === "android" ? (
+        <View style={styles.container}>
+          <GraphMob
+            data={graph}
+            options={options}
+          />
+        </View>
+      ) : (
+        <Text>LOADING....</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  graphFrame: {
-    borderColor: Colors.orange,
-    borderWidth: 20,
-  },
   container: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
+    ...StyleSheet.absoluteFillObject,
   },
   button: {
     backgroundColor: Colors.orange,
@@ -271,7 +252,7 @@ const styles = StyleSheet.create({
     margin: 5,
     borderRadius: 5,
     height: 35,
-    width: "20%",
+    width: "28%",
   },
   disableBtn: {
     backgroundColor: Colors.grey,
