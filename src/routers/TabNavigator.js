@@ -1,36 +1,18 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState} from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons, Entypo, FontAwesome } from '@expo/vector-icons';
-import { Keyboard, TouchableOpacity,View,SafeAreaView } from 'react-native';
+import { Fontisto } from '@expo/vector-icons';
+import { TouchableOpacity,View,SafeAreaView } from 'react-native';
 
 
-import HomeScreen from '../components/home'
-import ProfileScreen from '../components/profile'
-import SearchScreen from '../components/search'
+import MapScreen from '../components/map'
+import GraphScreen from '../components/graph'
 
 
 
 const TabBar = ({ state, navigation }) => {
 
     const [visible, setVisible] = useState(true);
-  
-    // const keyboardWillShow = () => {
-    //     setVisible(false);
-    // };
-  
-    // const keyboardWillHide = () => {
-    //     setVisible(true);
-    // };
-  
-    // useEffect(() => {
-    //     const keyboardWillShowSub = Keyboard.addListener(Platform.select({ android: 'keyboardDidShow', ios: 'keyboardWillShow' }), keyboardWillShow);
-    //     const keyboardWillHideSub = Keyboard.addListener(Platform.select({ android: 'keyboardDidHide', ios: 'keyboardWillHide' }), keyboardWillHide);
-    //     return () => {
-    //         keyboardWillShowSub.remove();
-    //         keyboardWillHideSub.remove();
-    //     }
-    // }, [])
-  
+    
     return (
   
       <View style={{ 
@@ -63,9 +45,9 @@ const TabBar = ({ state, navigation }) => {
                             marginBottom: 2 
                           }]}
                       >
-                          {label === 'Home' && <Ionicons name="home" size={24} color="white" />}
-                          {label === 'Search' && <Entypo name="magnifying-glass" size={24} color="white" />}
-                          {label === 'Profile' && <FontAwesome name="user" size={24} color="white" />}
+                    
+                          {label === 'Graph' && <Fontisto name="graphql" size={24} color="white" />}
+                          {label === 'Map' && <Fontisto name="map-marker-alt" size={24} color="white" />}
                       </TouchableOpacity>
                   ); 
           })}   
@@ -79,7 +61,7 @@ export const TabNavigator = () => {
     return (
         <SafeAreaView style={ { flex: 1, backgroundColor: '#fff' }}>
             <Tab.Navigator
-                initialRouteName='Profile'
+                initialRouteName='Map'
                 header={null}
                 headerMode='none'
                 tabBar={props => <TabBar {...props} />}
@@ -89,16 +71,12 @@ export const TabNavigator = () => {
                 backBehavior={'none'}
             >
             <Tab.Screen
-                name='Home'
-                component={HomeScreen}
+                name='Graph'
+                component={GraphScreen}
             />
             <Tab.Screen
-                name='Search'
-                component={SearchScreen}
-            />
-            <Tab.Screen
-                name='Profile'
-                component={ProfileScreen}
+                name='Map'
+                component={MapScreen}
             />
             </Tab.Navigator>
         </SafeAreaView>

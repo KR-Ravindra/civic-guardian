@@ -10,7 +10,6 @@ import {
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
-// import MapView, { Marker, Polyline } from "react-native-maps";
 import floydWarshall from "../../apis/FloydWarshall";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
@@ -21,12 +20,10 @@ if (Platform.OS === "android") {
   MapViewDirectionsMob =
     require("react-native-maps-directions").default;
 }
-let MapView, Marker, Polyline;
+let MapView
 
 if (Platform.OS === "web") {
-
   MapView = require('@preflower/react-native-web-maps').default;
-  Polyline = require('@preflower/react-native-web-maps').default;
 }
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
@@ -46,7 +43,7 @@ const debounce = (func, delay) => {
 };
 
 
-export default class ProfileScreen extends Component {
+export default class MapScreen extends Component {
   constructor(props) {
     super(props);
     this.state = this.props.stateOfMap;

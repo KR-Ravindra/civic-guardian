@@ -9,7 +9,7 @@ import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
-export default class SearchScreen extends Component {
+export default class GraphScreen extends Component {
   constructor(props) {
     super(props);
     // Initialize state
