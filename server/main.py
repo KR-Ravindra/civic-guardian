@@ -19,7 +19,9 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 
 
 
-async def get_distance(from_node, to_node):
+async def get_distance(from_node, to_node, source, destination):
+    if from_node['title'] == source and to_node['title'] == destination:
+        return 99999
     origin = f"{from_node['latlng']['latitude']},{from_node['latlng']['longitude']}"
     destination = f"{to_node['latlng']['latitude']},{to_node['latlng']['longitude']}"
 
@@ -39,18 +41,18 @@ async def get_distance(from_node, to_node):
     
     return distance
 
-async def build_graph(data):
+async def build_graph(data, source, destination):
     graph = [[0 for _ in range(len(data))] for _ in range(len(data))]
     for index, each_node in enumerate(data):
         for inner_index, each_inner_node in enumerate(data):
             if index == inner_index:
                 graph[index][inner_index] = {"value": 0, "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title'], "latlng": each_node['latlng']}
             else:
-                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node), "from": each_node['title'], "to": each_inner_node['title'], "via": "", "latlng": each_node['latlng']}
+                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node, source, destination), "from": each_node['title'], "to": each_inner_node['title'], "via": "", "latlng": each_node['latlng']}
     return graph
 
-async def floyd_warshall(data):
-    graph = await build_graph(data)
+async def floyd_warshall(data, source, destination):
+    graph = await build_graph(data, source, destination)
     for k in range(len(graph)):
         for i in range(len(graph)):
             for j in range(len(graph)):
@@ -59,7 +61,7 @@ async def floyd_warshall(data):
                     graph[i][j]["via"] = graph[k][j]["from"]
     return graph
 
-async def just_floyd_warshall(graph):
+async def just_floyd_warshall(graph, source, destination):
     for k in range(len(graph)):
         for i in range(len(graph)):
             for j in range(len(graph)):
@@ -70,9 +72,9 @@ async def just_floyd_warshall(graph):
 
 async def best_node(data):
     # sources = []
-    graph = await floyd_warshall(data)
     source = data[-2]["title"]
     destination = data[-1]["title"]
+    graph = await floyd_warshall(data, source, destination)
     for _, each_node in enumerate(graph):
         for _, each_inner_node in enumerate(each_node):
             if each_inner_node["from"] == source and each_inner_node["to"] == destination:
@@ -121,7 +123,7 @@ async def get_best_way_point(request: Request):
 async def get_fw_matrix(request: Request):
     result = await request.json()
     logger.info(f" Got Payload {result = }")
-    fw_matrix = await floyd_warshall(result['data'])
+    fw_matrix = await floyd_warshall(result['data'], result["data"][-2]["title"], result["data"][-1]["title"])
     logger.info(f"{fw_matrix = }")
     return fw_matrix
 
