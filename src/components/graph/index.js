@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert
 } from "react-native";
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -24,6 +25,7 @@ const GraphScreen = () => {
   const [step3, setStep3] = useState(false);
   const [step4, setStep4] = useState(false);
   const [step5, setStep5] = useState(false);
+  const [simulation, setSimulation] = useState(false);
 
   const options = {
     interaction:{
@@ -37,7 +39,7 @@ const GraphScreen = () => {
     edges: {
       color: "black",
       width: 1,
-      arrows: 'to;from',
+      arrows: "to;from",
       dashes: false,
       smooth: {
         type: "dynamic",
@@ -97,14 +99,14 @@ const GraphScreen = () => {
 
   const graph = {
     edges: [
-      { from: 1, to: 6, label: "hello"},
-      { from: 1, to: 7, label: "chjkscksjcbhsjkbcsh"},
-      { from: 2, to: 6, label: "chjkscksjcbhsjkbcsh" },
-      { from: 2, to: 7, label: "chjkscksjcbhsjkbcsh" },
-      { from: 3, to: 6, label: "chjkscksjcbhsjkbcsh" },
-      { from: 3, to: 7, label: "chjkscksjcbhsjkbcsh" },
-      { from: 4, to: 6, label: "chjkscksjcbhsjkbcsh" },
-      { from: 4, to: 7, label: "chjkscksjcbhsjkbcsh" },
+      { from: 1, to: 6, label: "" },
+      { from: 1, to: 7, label: "" },
+      { from: 2, to: 6, label: "" },
+      { from: 2, to: 7, label: "" },
+      { from: 3, to: 6, label: "" },
+      { from: 3, to: 7, label: "" },
+      { from: 4, to: 6, label: "" },
+      { from: 4, to: 7, label: "" },
       { from: 5, to: 6, label: "First Take This", color: "green"},
       { from: 5, to: 7, label: "Then Take This", color: "green" },
       { from: 6, to: 7, label: "TRAFFIC", color: "red"}
@@ -179,30 +181,42 @@ const GraphScreen = () => {
   ]
    
   };
+  
   const wait = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
-  const handleButtonClick = () => {
+  const onSimulation = () => {
+    setSimulation(true)
     setStep1(true);
-    wait(1000)
+    wait(2500)
+    .then(() =>  alert("Oops! Traffic Detected", "OK"))
     .then(() => { setStep1(false);setStep2(true)})
-    .then(() => wait(1000))
+    .then(() => wait(2500))
+    .then(() => alert("Recalculating the best route! Determining popular hubs!", "OK"))
     .then(() => { setStep2(false);setStep3(true)})
-
-    .then(() => wait(1000))
+    .then(() => wait(2500))
+    .then(() => alert("Establishing the best possible route!", "OK"))
     .then(() => { setStep3(false);setStep4(true)})
-    .then(() => wait(1000))
+    .then(() => wait(2500))
+    .then(() => alert("Generating the complete matrix!", "OK"))
     .then(() => {
       setStep4(false);
       setStep5(true);
-  })
+    })
+  };
+  const onReset = () => {
+    setStep1(false)
+    setStep2(false)
+    setStep3(false)
+    setStep4(false)
+    setStep5(false)
   };
 
 
   return (
     <View style={styles.container}>
       <ErrorBoundary>
-        <TouchableOpacity style={styles.button} onPress={()=>{handleButtonClick()}}>
+        <TouchableOpacity style={styles.button} onPress={()=>{onSimulation()}}>
         <View style={{ flexDirection: "row" }}>
           <MaterialCommunityIcons
             name="graphql"
@@ -211,24 +225,23 @@ const GraphScreen = () => {
             style={{ marginRight: 10 }}
           />
           <Text style={styles.buttonText}>Simulation</Text>
-          </View>
+        </View>
         </TouchableOpacity>
           { step1 && (
-            <GraphStep1 graphOptions={options} 
+            <GraphStep1 graphOptions={options}
             graphNodes={{
               edges: [{ from: 6, to: 7, label: "", color: "green" }],
               nodes: [
                 { ...graph.nodes[graph.nodes.length - 2] },
                 { ...graph.nodes[graph.nodes.length - 1] },
               ],
-             
             }}
             ></GraphStep1>
             )}
             { step2 && (
             <GraphStep2  graphOptions={options} 
             graphNodes={{
-              edges: [{ from: 6, to: 7, label: "", color: "red" }],
+              edges: [{ from: 6, to: 7, label: "TRAFFIC", color: "red" }],
               nodes: [
                 { ...graph.nodes[graph.nodes.length - 2] },
                 { ...graph.nodes[graph.nodes.length - 1] },
@@ -252,6 +265,19 @@ const GraphScreen = () => {
           { step5 && (
             <GraphStep5  graphOptions={options} graphNodes={graph}></GraphStep5>
             )}
+        { simulation && step5 && (
+        <TouchableOpacity style={styles.button} onPress={()=>{onReset()}}>
+        <View style={{ flexDirection: "row" }}>
+          <MaterialCommunityIcons
+            name="graphql"
+            size={24}
+            color={Colors.white}
+            style={{ marginRight: 10 }}
+          />
+          <Text style={styles.buttonText}>Reset</Text>
+          </View>
+        </TouchableOpacity>
+        )}
       </ErrorBoundary>
       </View>
   );

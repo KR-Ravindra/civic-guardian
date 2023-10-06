@@ -19,7 +19,6 @@ if (Platform.OS === "android") {
 }
 
 const GraphStep3 = ({graphOptions,graphNodes}) => {
-    console.log('graphNodes33333',graphNodes)
 
   return (
     <View style={styles.container}>
