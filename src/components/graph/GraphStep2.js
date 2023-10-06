@@ -18,77 +18,7 @@ if (Platform.OS === "android") {
   GraphMob = require("react-native-vis-network").default;
 }
 
-const GraphStep2 = () => {
-  const [step2, setStep2] = useState(false);
-  const options = {
-    interaction:{
-      selectable: true,
-      hover: true
-    },
-    autoResize: true,
-    layout: {
-      hierarchical: false
-    },
-    edges: {
-      color: "black",
-      width: 1,
-      arrows: 'to;from',
-      dashes: false,
-      smooth: {
-        type: "dynamic",
-        forceDirection: "horizontal",
-        roundness: 0.5
-      },
-      shadow: {
-        enabled: true
-      }
-    },
-    nodes: {
-      shape: "ellipse",
-      size: 50,
-      borderWidth: 5,
-      color: {
-        border: "red",
-        background: "white",
-      },
-      font: {
-        size: 16
-      },
-    },
-    height: '100%',
-    width: '100%',
-    physics: {
-      forceAtlas2Based: {
-        gravitationalConstant: -50,
-        centralGravity: 0.001,
-        springLength: 200,
-        springConstant: 0.08
-      },
-      maxVelocity: 50,
-      solver: "forceAtlas2Based",
-      timestep: 0.35,
-      stabilization: {
-        enabled: false,
-        iterations: 1000,
-        updateInterval: 2
-      }
-    },
-    groups: {
-      green: {
-        color: {
-          border: "green",
-          background: "green",
-          highlight: {
-            border: "green",
-            background: "green"
-          }
-        },
-        font: {
-          color: "white"
-        }
-      }
-    }
-  }
+const GraphStep2 = (graphOptions) => {
 
   const graph = {
     edges: [
@@ -119,11 +49,6 @@ const GraphStep2 = () => {
     ]
   };
 
-  const handleButtonClick = () => {
-    console.log("Hey There")
-    setStep2(true);
-    console.log("Step 3 is ", step3)
-  };
 
 
   return (
@@ -132,22 +57,14 @@ const GraphStep2 = () => {
         <ErrorBoundary>
             <GraphWeb
               graph={graph}
-              options={options}
-              events={{
-                configure: function (event, properties) {
-                  properties.options.animation = {
-                    duration: 1000,
-                    easingFunction: "easeInOutQuad",
-                  };
-                },
-              }}
+              options={graphOptions.graphOptions}
             />
           </ErrorBoundary>
       ) : Platform.OS === "android" ? (
         <View style={styles.container}>
           <GraphMob
             data={graph}
-            options={options}
+            options={graphOptions.graphOptions}
           />
         </View>
       ) : (
@@ -161,27 +78,6 @@ const GraphStep2 = () => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-  },
-  button: {
-    backgroundColor: Colors.orange,
-    padding: 8,
-    margin: 5,
-    borderRadius: 5,
-    height: 35,
-    width: "28%",
-  },
-  disableBtn: {
-    backgroundColor: Colors.grey,
-    padding: 8,
-    margin: 5,
-    borderRadius: 5,
-    height: 35,
-    width: "20%",
-  },
-  buttonText: {
-    color: Colors.white,
-    textAlign: "center",
-    fontWeight: "bold",
   },
 });
 
