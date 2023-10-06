@@ -10,7 +10,6 @@ import {
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ErrorBoundary from "../errorBoundry";
-import GraphStep4 from "./GraphStep4";
 
 let GraphWeb, GraphMob;
 
@@ -22,7 +21,7 @@ if (Platform.OS === "android") {
   GraphMob = require("react-native-vis-network").default;
 }
 
-const GraphScreen = () => {
+const GraphStep4 = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [step1, setStep1] = useState(false);
   const options = {
@@ -190,23 +189,47 @@ const GraphScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ErrorBoundary>
-        <TouchableOpacity style={styles.button} onPress={()=>{setStep1(true)}}>
-        <View style={{ flexDirection: "row" }}>
-          <MaterialCommunityIcons
-            name="graphql"
-            size={24}
-            color={Colors.white}
-            style={{ marginRight: 10 }}
-          />
-          <Text style={styles.buttonText}>Simulation</Text>
+      {Platform.OS === "web" ? (
+        <ErrorBoundary>
+          <View style={styles.container}>
+          <TouchableOpacity style={styles.button} onPress={()=>{setStep1(true)}}>
+          <View style={{ flexDirection: "row" }}>
+            <MaterialCommunityIcons
+              name="graphql"
+              size={24}
+              color={Colors.white}
+              style={{ marginRight: 10 }}
+            />
+            <Text style={styles.buttonText}>Simulation</Text>
           </View>
         </TouchableOpacity>
           { step1 && (
-            <GraphStep4></GraphStep4>
-            )}
-      </ErrorBoundary>
-      </View>
+            <GraphWeb
+              graph={graph}
+              options={options}
+              events={{
+                configure: function (event, properties) {
+                  properties.options.animation = {
+                    duration: 1000,
+                    easingFunction: "easeInOutQuad",
+                  };
+                },
+              }}
+            />)}
+          </View>
+        </ErrorBoundary>
+      ) : Platform.OS === "android" ? (
+        <View style={styles.container}>
+          <GraphMob
+            data={graph}
+            options={options}
+          />
+        </View>
+      ) : (
+        <Text>LOADING....</Text>
+      )}
+    </View>
+
   );
 };
 
@@ -237,4 +260,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GraphScreen;
+export default GraphStep4;
