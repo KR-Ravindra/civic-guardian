@@ -220,10 +220,17 @@ const GraphScreen = () => {
             <GraphStep2  graphOptions={options}></GraphStep2>
             )}
             { step3&& (
-            <GraphStep3  graphOptions={options}></GraphStep3>
+            <GraphStep3  graphOptions={options}
+            graphNodes={{...graph, edges: [
+            { from: 6, to: 7, label: "TRAFFIC", color: "red"}]}}>
+            </GraphStep3>
             )}
             { step4 && (
-            <GraphStep4  graphOptions={options} graphNodes={graph}></GraphStep4>
+            <GraphStep4  graphOptions={options} 
+            graphNodes={{...graph, edges: [{ from: 5, to: 6, label: "First Take This", color: "green"},
+            { from: 5, to: 7, label: "Then Take This", color: "green" },
+            { from: 6, to: 7, label: "TRAFFIC", color: "red"}]}}>
+            </GraphStep4>
             )}
           { step5 && (
             <GraphStep5  graphOptions={options} graphNodes={graph}></GraphStep5>
