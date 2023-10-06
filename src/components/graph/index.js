@@ -14,6 +14,7 @@ import GraphStep1 from "./GraphStep1";
 import GraphStep2 from "./GraphStep2";
 import GraphStep3 from "./GraphStep3";
 import GraphStep4 from "./GraphStep4";
+import GraphStep5 from "./GraphStep5";
 
 
 
@@ -24,13 +25,23 @@ const GraphScreen = () => {
   const [step3, setStep3] = useState(false);
   const [step4, setStep4] = useState(false);
   const [step5, setStep5] = useState(false);
+
+  const wait = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
   const handleButtonClick = () => {
     console.log("Hey There")
-    // setStep1(true);
-    // setStep2(true)
-    setStep3(true)
-
-    // setStep4(true);
+    wait(1000)
+    .then(() => setStep2(true))
+    .then(() => wait(1000))
+    .then(() => setStep3(true))
+    .then(() => wait(1000))
+    .then(() => setStep4(true))
+    .then(() => wait(1000))
+    .then(() => {
+      setStep4(false);
+      setStep5(true);
+  })
     console.log("Step 1 is ", step1)
   };
 
@@ -60,6 +71,9 @@ const GraphScreen = () => {
             )}
             { step4 && (
             <GraphStep4></GraphStep4>
+            )}
+          { step5 && (
+            <GraphStep5></GraphStep5>
             )}
       </ErrorBoundary>
       </View>

@@ -19,7 +19,7 @@ if (Platform.OS === "android") {
   GraphMob = require("react-native-vis-network").default;
 }
 
-const GraphStep4 = () => {
+const GraphStep5 = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [step1, setStep1] = useState(false);
   const options = {
@@ -94,6 +94,14 @@ const GraphStep4 = () => {
 
   const graph = {
     edges: [
+      { from: 1, to: 6, label: "hello"},
+      { from: 1, to: 7, label: "chjkscksjcbhsjkbcsh"},
+      { from: 2, to: 6, label: "chjkscksjcbhsjkbcsh" },
+      { from: 2, to: 7, label: "chjkscksjcbhsjkbcsh" },
+      { from: 3, to: 6, label: "chjkscksjcbhsjkbcsh" },
+      { from: 3, to: 7, label: "chjkscksjcbhsjkbcsh" },
+      { from: 4, to: 6, label: "chjkscksjcbhsjkbcsh" },
+      { from: 4, to: 7, label: "chjkscksjcbhsjkbcsh" },
       { from: 5, to: 6, label: "First Take This", color: "green"},
       { from: 5, to: 7, label: "Then Take This", color: "green" },
       { from: 6, to: 7, label: "TRAFFIC", color: "red"}
@@ -169,12 +177,6 @@ const GraphStep4 = () => {
    
   };
 
-  const handleButtonClick = () => {
-    console.log("Hey There")
-    setIsButtonDisabled(true);
-    setStep1(true);
-    console.log("Step 1 is ", step1)
-  };
 
 
   return (
@@ -236,4 +238,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GraphStep4;
+export default GraphStep5;
