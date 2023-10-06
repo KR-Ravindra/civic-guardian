@@ -4,8 +4,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Platform,
-  Button
 } from "react-native";
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -30,19 +28,19 @@ const GraphScreen = () => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
   const handleButtonClick = () => {
-    console.log("Hey There")
+    setStep1(true);
     wait(1000)
-    .then(() => setStep2(true))
+    .then(() => { setStep1(false);setStep2(true)})
     .then(() => wait(1000))
-    .then(() => setStep3(true))
+    .then(() => { setStep2(false);setStep3(true)})
+
     .then(() => wait(1000))
-    .then(() => setStep4(true))
+    .then(() => { setStep3(false);setStep4(true)})
     .then(() => wait(1000))
     .then(() => {
       setStep4(false);
       setStep5(true);
   })
-    console.log("Step 1 is ", step1)
   };
 
 

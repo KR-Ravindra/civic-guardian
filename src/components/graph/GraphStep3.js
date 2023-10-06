@@ -92,16 +92,6 @@ const GraphStep3 = () => {
 
   const graph = {
     edges: [
-    //   { from: 1, to: 6, label: "hello"},
-    //   { from: 1, to: 7, label: "chjkscksjcbhsjkbcsh"},
-    //   { from: 2, to: 6, label: "chjkscksjcbhsjkbcsh" },
-    //   { from: 2, to: 7, label: "chjkscksjcbhsjkbcsh" },
-    //   { from: 3, to: 6, label: "chjkscksjcbhsjkbcsh" },
-    //   { from: 3, to: 7, label: "chjkscksjcbhsjkbcsh" },
-    //   { from: 4, to: 6, label: "chjkscksjcbhsjkbcsh" },
-    //   { from: 4, to: 7, label: "chjkscksjcbhsjkbcsh" },
-    //   { from: 5, to: 6, label: "First Take This", color: "green"},
-    //   { from: 5, to: 7, label: "Then Take This", color: "green" },
       { from: 6, to: 7, label: "TRAFFIC", color: "red"}
     ],
     nodes: [
@@ -148,7 +138,6 @@ const GraphStep3 = () => {
               "longitude": -117.9245297
           },
           "label": "Matador Cantina",
-          "group": "green",
           "id": 5
       },
       {

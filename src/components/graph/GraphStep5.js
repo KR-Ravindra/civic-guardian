@@ -6,7 +6,6 @@ import {
   Platform,
 } from "react-native";
 import Colors from "../../style/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ErrorBoundary from "../errorBoundry";
 
 let GraphWeb, GraphMob;
