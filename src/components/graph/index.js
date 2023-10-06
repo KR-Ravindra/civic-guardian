@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  Button
 } from "react-native";
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -21,8 +22,8 @@ if (Platform.OS === "android") {
 }
 
 const GraphScreen = () => {
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [step1, setStep1] = useState(false);
   const options = {
     interaction:{
       selectable: true,
@@ -179,41 +180,30 @@ const GraphScreen = () => {
   };
 
   const handleButtonClick = () => {
+    console.log("Hey There")
     setIsButtonDisabled(true);
+    setStep1(true);
+    console.log("Step 1 is ", step1)
   };
 
 
   return (
     <View style={styles.container}>
-      {!isButtonDisabled && (
-        <TouchableOpacity style={styles.button} onPress={handleButtonClick}>
-          <View style={{ flexDirection: "row" }}>
-            <MaterialCommunityIcons
-              name="graphql"
-              size={24}
-              color={Colors.white}
-              style={{ marginRight: 10 }}
-            />
-            <Text style={styles.buttonText}>Simulation</Text>
-          </View>
-        </TouchableOpacity>
-      )}
-      {isButtonDisabled && (
-        <TouchableOpacity style={styles.disableBtn}>
-          <View style={{ flexDirection: "row" }}>
-            <MaterialCommunityIcons
-              name="graphql"
-              size={24}
-              color={Colors.white}
-              style={{ marginRight: 10 }}
-            />
-            <Text style={styles.buttonText}>Simulation</Text>
-          </View>
-        </TouchableOpacity>
-      )}
       {Platform.OS === "web" ? (
         <ErrorBoundary>
           <View style={styles.container}>
+          <TouchableOpacity style={styles.button} onPress={()=>{setStep1(true)}}>
+          <View style={{ flexDirection: "row" }}>
+            <MaterialCommunityIcons
+              name="graphql"
+              size={24}
+              color={Colors.white}
+              style={{ marginRight: 10 }}
+            />
+            <Text style={styles.buttonText}>Simulation</Text>
+          </View>
+        </TouchableOpacity>
+          { step1 && (
             <GraphWeb
               graph={graph}
               options={options}
@@ -225,7 +215,7 @@ const GraphScreen = () => {
                   };
                 },
               }}
-            />
+            />)}
           </View>
         </ErrorBoundary>
       ) : Platform.OS === "android" ? (
@@ -239,6 +229,7 @@ const GraphScreen = () => {
         <Text>LOADING....</Text>
       )}
     </View>
+
   );
 };
 
