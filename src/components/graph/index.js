@@ -10,7 +10,12 @@ import {
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ErrorBoundary from "../errorBoundry";
+import GraphStep1 from "./GraphStep1";
+import GraphStep2 from "./GraphStep2";
+import GraphStep3 from "./GraphStep3";
 import GraphStep4 from "./GraphStep4";
+
+
 
 
 const GraphScreen = () => {
@@ -21,7 +26,11 @@ const GraphScreen = () => {
   const [step5, setStep5] = useState(false);
   const handleButtonClick = () => {
     console.log("Hey There")
-    setStep4(true);
+    // setStep1(true);
+    // setStep2(true)
+    setStep3(true)
+
+    // setStep4(true);
     console.log("Step 1 is ", step1)
   };
 
@@ -40,7 +49,16 @@ const GraphScreen = () => {
           <Text style={styles.buttonText}>Simulation</Text>
           </View>
         </TouchableOpacity>
-          { step4 && (
+          { step1 && (
+            <GraphStep1></GraphStep1>
+            )}
+            { step2 && (
+            <GraphStep2></GraphStep2>
+            )}
+            { step3&& (
+            <GraphStep3></GraphStep3>
+            )}
+            { step4 && (
             <GraphStep4></GraphStep4>
             )}
       </ErrorBoundary>
