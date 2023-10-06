@@ -210,12 +210,14 @@ const GraphScreen = () => {
     setStep3(false)
     setStep4(false)
     setStep5(false)
+    setSimulation(false)
   };
 
 
   return (
     <View style={styles.container}>
       <ErrorBoundary>
+        { !simulation && (
         <TouchableOpacity style={styles.button} onPress={()=>{onSimulation()}}>
         <View style={{ flexDirection: "row" }}>
           <MaterialCommunityIcons
@@ -224,9 +226,10 @@ const GraphScreen = () => {
             color={Colors.white}
             style={{ marginRight: 10 }}
           />
-          <Text style={styles.buttonText}>Simulation</Text>
+          <Text style={styles.buttonText}>Simulate Now</Text>
         </View>
         </TouchableOpacity>
+        )}
           { step1 && (
             <GraphStep1 graphOptions={options}
             graphNodes={{
@@ -274,7 +277,7 @@ const GraphScreen = () => {
             color={Colors.white}
             style={{ marginRight: 10 }}
           />
-          <Text style={styles.buttonText}>Reset</Text>
+          <Text style={styles.buttonText}>Reset Simulation</Text>
           </View>
         </TouchableOpacity>
         )}
