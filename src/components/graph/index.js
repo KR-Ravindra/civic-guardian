@@ -214,10 +214,27 @@ const GraphScreen = () => {
           </View>
         </TouchableOpacity>
           { step1 && (
-            <GraphStep1 graphOptions={options}></GraphStep1>
+            <GraphStep1 graphOptions={options} 
+            graphNodes={{
+              edges: [{ from: 6, to: 7, label: "", color: "green" }],
+              nodes: [
+                { ...graph.nodes[graph.nodes.length - 2] },
+                { ...graph.nodes[graph.nodes.length - 1] },
+              ],
+             
+            }}
+            ></GraphStep1>
             )}
             { step2 && (
-            <GraphStep2  graphOptions={options}></GraphStep2>
+            <GraphStep2  graphOptions={options} 
+            graphNodes={{
+              edges: [{ from: 6, to: 7, label: "", color: "red" }],
+              nodes: [
+                { ...graph.nodes[graph.nodes.length - 2] },
+                { ...graph.nodes[graph.nodes.length - 1] },
+              ],
+            }}
+            ></GraphStep2>
             )}
             { step3&& (
             <GraphStep3  graphOptions={options}

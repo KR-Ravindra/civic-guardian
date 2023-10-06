@@ -5,7 +5,6 @@ import {
   View,
   Platform,
 } from "react-native";
-import Colors from "../../style/colors";
 import ErrorBoundary from "../errorBoundry";
 
 let GraphWeb, GraphMob;
@@ -19,7 +18,6 @@ if (Platform.OS === "android") {
 }
 
 const GraphStep4 = ({graphOptions,graphNodes}) => {
-  console.log('Graph4',graphNodes)
 
   return (
     <View style={styles.container}>

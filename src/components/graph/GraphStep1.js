@@ -17,53 +17,22 @@ if (Platform.OS === "android") {
   GraphMob = require("react-native-vis-network").default;
 }
 
-const GraphStep1 = (graphOptions) => {
-
-  const graph = {
-    edges: [
-        { from: 6, to: 7, label: "", color: "green"}
-    ],
-    nodes: [
-      {
-        "description": "restaurant",
-        "latlng": {
-            "latitude": 33.8708538,
-            "longitude": -117.9245297
-        },
-        "label": "Source",
-        "group": "green",
-        "id": 6
-    },
-    {
-      "description": "restaurant",
-      "latlng": {
-          "latitude": 33.8708538,
-          "longitude": -117.9245297
-      },
-      "label": "Destination",
-      "group": "green",
-      "id": 7
-  }
-  ]
-   
-  };
-
-
+const GraphStep1 = ({graphOptions,graphNodes}) => {
 
   return (
     <View style={styles.container}>
       {Platform.OS === "web" ? (
         <ErrorBoundary>
             <GraphWeb
-              graph={graph}
-              options={graphOptions.graphOptions}
+              graph={graphNodes}
+              options={graphOptions}
             />
           </ErrorBoundary>
       ) : Platform.OS === "android" ? (
         <View style={styles.container}>
           <GraphMob
-            data={graph}
-            options={graphOptions.graphOptions}
+            data={graphNodes}
+            options={graphOptions}
           />
         </View>
       ) : (
