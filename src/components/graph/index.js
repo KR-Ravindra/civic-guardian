@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from "react-native";
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -14,16 +13,9 @@ import GraphStep2 from "./GraphStep2";
 import GraphStep3 from "./GraphStep3";
 import GraphStep4 from "./GraphStep4";
 import GraphStep5 from "./GraphStep5";
+import Toast from 'react-native-toast-message';
+import ToastProvider from 'react-native-toast-message'
 
-let toastWeb, ToastContainer;
-
-
-if (Platform.OS === "web") {
-  toastWeb = require("react-toastify").toast;
-  ToastContainer = require("react-toastify").ToastContainer;
-  require("./dist/ReactToastify.css");
-  // require("../../../node_modules/react-toastify/dist/ReactToastify.css");
-}
 
 
 const GraphScreen = () => {
@@ -188,26 +180,15 @@ const GraphScreen = () => {
     ],
   };
 
-  let showToast;
-
-  if (Platform.OS === "web") {
-
-    const CustomToast = ({ closeToast, message }) => (
-      <div>
-        <div>{message}</div>
-        <button onClick={closeToast}>OK</button>
-      </div>
-    );
-
-    showToast = (message) => {
-      toastWeb.info(<CustomToast message={message} />, {
-        autoClose: 2800,
-      });
-    };
-  }
-
- 
-
+const showToast = (message) => {
+  Toast.show({
+    type: 'info',
+    position: 'top',
+    text1: message,
+  
+  });
+  
+};
  
 
   const wait = (ms) => {
@@ -261,8 +242,7 @@ const GraphScreen = () => {
   return (
     <View style={styles.container}>
       <ErrorBoundary>
-     
-      {Platform.OS === "web" && <ToastContainer style={{ marginTop: 50 }} />}
+      <ToastProvider/>
 
         {!simulation && (
           <TouchableOpacity
