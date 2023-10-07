@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -50,13 +50,13 @@ export default class MapScreen extends Component {
     super(props);
     this.state = this.props.stateOfMap;
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
-    console.log("Props are ", this.props);
+
   }
 
   // fetchRouteData(origin, waypoint, destination) {
   fetchRouteData(originLatLong, waypointLatLong, destinationLatLong) {
     console.log("Function is called");
-    console.log("Waypoint is", waypointLatLong);
+    console.log("Waypoint in fetchRouteData is", waypointLatLong);
 
     const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
     const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
@@ -81,38 +81,27 @@ export default class MapScreen extends Component {
         }
       })
       .catch((error) => {
-        console.error("Error fetching route:", error);
+        console.error("Error fetching route with routes api:", error);
       });
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps != this.props) {
-      console.log("Component Updated with props ", this.props);
       this.setState(this.props.stateOfMap);
     }
     if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw) {
-      console.log("Plot Requested with props ", this.props);
       if (Platform.OS === "web") {
-        floydWarshall(this.props.stateOfMap.markers)
-          .then((best_waypoint) => {
-            console.log("Best waypoint is", best_waypoint);
-            if (best_waypoint) {
-              this.fetchRouteData(
-                this.props.stateOfMap.plot.origin,
-                best_waypoint,
-                this.props.stateOfMap.plot.destination
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
+          let best_waypoint;
+          this.fetchRouteData(
+            this.props.stateOfMap.plot.origin,
+            this.props.stateOfMap.plot.waypoint,
+            this.props.stateOfMap.plot.destination
+          );
+          }
       }
     }
-  }
 
   componentDidMount() {
-    console.log("Component is mounted with props ", this.props);
     if (Platform.OS === "web") {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
@@ -221,7 +210,6 @@ export default class MapScreen extends Component {
                     <img
                       source={custom_pin}
                       style={styles.markerImage}
-                      resizeMode="contain"
                     />
                   </View>
                 </MapView.Marker>
@@ -231,7 +219,6 @@ export default class MapScreen extends Component {
                     <img
                       source={custom_pin}
                       style={styles.markerImage}
-                      resizeMode="contain"
                     />
                   </View>
                 </MapView.Marker>
@@ -283,7 +270,6 @@ export default class MapScreen extends Component {
                   <Image
                     source={custom_pin}
                     style={styles.markerImage}
-                    resizeMode="contain"
                   />
                 </View>
                 </MarkerMob>
@@ -295,7 +281,6 @@ export default class MapScreen extends Component {
                   <Image
                     source={custom_pin}
                     style={styles.markerImage}
-                    resizeMode="contain"
                   />
                 </View>
                 </MarkerMob>

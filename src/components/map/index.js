@@ -80,20 +80,18 @@ const MainMapScreen = () => {
       }
     })
     const newMarkers = getHubs(stateOfMap.region);
-    console.log("New markers just generated are", newMarkers);
+
 
 
 
     return (
         <View style={styles.container}>
-          {console.log("Predefined markers are ", dummyMarkers)}
-          {console.log("Function derived markers are ", newMarkers)}
         <ErrorBoundary>
           <View style={styles.container}>
           <ShowMapScreen 
             stateOfMap={stateOfMap} 
-            onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: dummyMarkers, googleMapsLoaded: true} );console.log("Modified state of map to ", stateOfMap)}}
-            onPressPlotter={() => { console.log("Markers are" , newMarkers);setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw) }} );console.log("Modified state of map to ", stateOfMap)}}
+            onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: dummyMarkers, googleMapsLoaded: true} )}}
+            onPressPlotter={() => { setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw) }})}}
              ></ShowMapScreen>
           </View>
         </ErrorBoundary>
