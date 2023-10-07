@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -17,7 +17,7 @@ if (Platform.OS === "android") {
   GraphMob = require("react-native-vis-network").default;
 }
 
-const GraphStep4 = ({graphOptions,graphNodes}) => {
+const Graph = ({graphOptions,graphNodes}) => {
 
   return (
     <View style={styles.container}>
@@ -26,7 +26,6 @@ const GraphStep4 = ({graphOptions,graphNodes}) => {
             <GraphWeb
               graph={graphNodes}
               options={graphOptions}
-             
             />
           </ErrorBoundary>
       ) : Platform.OS === "android" ? (
@@ -51,4 +50,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default GraphStep4;
+export default Graph;

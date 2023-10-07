@@ -10,11 +10,7 @@ import { MaterialCommunityIcons,FontAwesome } from "@expo/vector-icons";
 
 import Manual from "./manual"
 import ErrorBoundary from "../errorBoundry";
-import GraphStep1 from "./GraphStep1";
-import GraphStep2 from "./GraphStep2";
-import GraphStep3 from "./GraphStep3";
-import GraphStep4 from "./GraphStep4";
-import GraphStep5 from "./GraphStep5";
+import Graph from "./Graph";
 import Toast from 'react-native-toast-message';
 import ToastProvider from 'react-native-toast-message'
 
@@ -286,7 +282,7 @@ const closeModal = () => {
          {isModalVisible && <Manual isVisible={isModalVisible} onClosePress={()=>closeModal()}/>}
 
         {step1 && (
-          <GraphStep1
+          <Graph
             graphOptions={options}
             graphNodes={{
               edges: [{ from: 6, to: 7, label: "", color: "green" }],
@@ -295,10 +291,10 @@ const closeModal = () => {
                 { ...graph.nodes[graph.nodes.length - 1] },
               ],
             }}
-          ></GraphStep1>
+          ></Graph>
         )}
         {step2 && (
-          <GraphStep2
+          <Graph
             graphOptions={options}
             graphNodes={{
               edges: [{ from: 6, to: 7, label: "TRAFFIC", color: "red" }],
@@ -307,19 +303,19 @@ const closeModal = () => {
                 { ...graph.nodes[graph.nodes.length - 1] },
               ],
             }}
-          ></GraphStep2>
+          ></Graph>
         )}
         {step3 && (
-          <GraphStep3
+          <Graph
             graphOptions={options}
             graphNodes={{
               ...graph,
               edges: [{ from: 6, to: 7, label: "TRAFFIC", color: "red" }],
             }}
-          ></GraphStep3>
+          ></Graph>
         )}
         {step4 && (
-          <GraphStep4
+          <Graph
             graphOptions={options}
             graphNodes={{
               ...graph,
@@ -329,10 +325,10 @@ const closeModal = () => {
                 { from: 6, to: 7, label: "TRAFFIC", color: "red" },
               ],
             }}
-          ></GraphStep4>
+          ></Graph>
         )}
         {step5 && (
-          <GraphStep5 graphOptions={options} graphNodes={graph}></GraphStep5>
+          <Graph graphOptions={options} graphNodes={graph}></Graph>
         )}
         {simulation && step5 && (
           <TouchableOpacity
