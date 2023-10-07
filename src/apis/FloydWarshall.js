@@ -1,5 +1,6 @@
 async function floydWarshall(nodes) {
     // makes a fetch call to localhost:8000/api/floyd_warshall
+    let waypoint = {};
     console.log("Nodes are", nodes)
     const nodesList = nodes.map(node => ({ id: node.key, ...node }));
     console.log("Nodes list is", nodesList)
@@ -10,7 +11,7 @@ async function floydWarshall(nodes) {
 
     let url = "http://localhost:8000/getBestWayPoint"
 
-    fetch(url, {
+    await fetch(url, {
         method: "POST",
         body: JSON.stringify(payload),
         headers: {
@@ -22,13 +23,15 @@ async function floydWarshall(nodes) {
             return response.json()
         }
     })
-    .then(data => {
-        console.log("Data from backend :", data.latlng);
-        return data.latlng;
+    .then((data) => {
+        waypoint = data;
+        return data;
     })
     .catch(error => {
         console.log("Error from backend :", error);
     });
+    console.log("waypoint is ", waypoint)
+    return waypoint;
 }
 
 export default floydWarshall;
