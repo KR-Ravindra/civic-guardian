@@ -53,23 +53,29 @@ export default class MapScreen extends Component {
 
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps != this.props) {
+  async componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
       this.setState(this.props.stateOfMap);
     }
-    if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw) {
+  
+    if (prevProps.stateOfMap.plot.draw !== this.props.stateOfMap.plot.draw) {
       if (Platform.OS === "web") {
-          let new_coords;
-          const coords = fetchRouteData(
+        try {
+          // console.log('floydAPI',floydWarshall(this.props.map.markers))
+          const coords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
             this.props.stateOfMap.plot.waypoint,
             this.props.stateOfMap.plot.destination
           );
-          console.log("Coords are ", coords)
-          this.setState({ coords: coords });
-          }
+          console.log("Coords are 68 ", coords);
+          this.setState({ coords });
+        } catch (error) {
+          console.error('Error fetching COORDS', error);
+        }
       }
     }
+  }
+  
 
   componentDidMount() {
     if (Platform.OS === "web") {
