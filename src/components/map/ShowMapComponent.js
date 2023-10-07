@@ -173,6 +173,10 @@ export default class MapScreen extends Component {
     console.log("Map panned or dragged");
   };
 
+  onPolylineClicked = () => {
+    console.log("Polyline pressed:");
+  };
+
   render() {
     const {
       coords,
@@ -241,6 +245,10 @@ export default class MapScreen extends Component {
                       }))}
                       strokeWidth={4}
                       strokeColor="royalblue"
+                      tappable={true}
+                      onClick={() => {
+                        this.onPolylineClicked()
+                      }}
                     />
                   ))}
               </MapView>
