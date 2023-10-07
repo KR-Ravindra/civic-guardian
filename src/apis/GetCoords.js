@@ -1,6 +1,4 @@
 async function fetchRouteData(originLatLong, waypointLatLong, destinationLatLong) {
-  console.log("Waypoint in fetchRouteData is", waypointLatLong);
-
   const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
   const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
   const waypoint = `${waypointLatLong.latitude},${waypointLatLong.longitude}`;

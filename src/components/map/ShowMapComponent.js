@@ -65,7 +65,7 @@ export default class MapScreen extends Component {
     if (prevProps.stateOfMap.plot.draw !== this.props.stateOfMap.plot.draw) {
       if (Platform.OS === "web") {
         try {
-          // console.log('floydAPI',floydWarshall(this.props.map.markers))
+          console.log('floydAPI',floydWarshall(this.props.stateOfMap.markers))
           const coords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
             this.props.stateOfMap.plot.waypoint,
@@ -189,8 +189,8 @@ export default class MapScreen extends Component {
                         latitude: coord[0],
                         longitude: coord[1],
                       }))}
-                      strokeWidth={4}
-                      strokeColor={showIcon?"red":"royalblue"}
+                      strokeWidth={14}
+                      strokeColor="royalblue"
                       tappable={true}
                       onClick={() => {
                         this.onPolylineClicked()
@@ -260,7 +260,7 @@ export default class MapScreen extends Component {
                     ]}
                     destination={destination}
                     apikey={apiKey}
-                    strokeWidth={4}
+                    strokeWidth={14}
                     strokeColor="hotpink"
                   />
                 )}

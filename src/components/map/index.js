@@ -58,8 +58,8 @@ const MainMapScreen = () => {
         description: "Marker Description 5",
       },
     ];
-    const origin = { latitude: 33.8365932, longitude: -117.9143012 };
-    const destination = { latitude: 33.8736902, longitude: -117.923685 };
+    const origin = { latitude: 33.88129149999999, longitude: -117.925334 };
+    const destination = { latitude: 33.859034, longitude: -117.9414924 };
     const [stateOfMap, setStateOfMap] = useState({
       coords: [],
       region: {
@@ -76,12 +76,10 @@ const MainMapScreen = () => {
         draw: false,
         origin: { latitude: origin.latitude, longitude: origin.longitude },
         destination: { latitude: destination.latitude, longitude: destination.longitude },
-        waypoint: {latitude: 33.8586294, longitude: -117.9192771}
+        waypoint: {latitude: 33.8589565, longitude: -117.9589782}
       }
     })
     const newMarkers = getHubs(stateOfMap.region);
-
-
 
 
     return (

@@ -17,6 +17,7 @@ function getHubs(current_location)  {
         }
     })
     .then((data) => {
+        console.log("Data: ", data);
         data.results.forEach((object, index) => {
           if (index < 15) {
           hub.push({
@@ -30,6 +31,7 @@ function getHubs(current_location)  {
           }); 
         }
         });
+        console.log("Hubs are ", hub)
         return hub;
       })
       .catch((error) => {
