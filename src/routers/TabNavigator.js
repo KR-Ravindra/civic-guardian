@@ -61,7 +61,7 @@ export const TabNavigator = () => {
     return (
         <SafeAreaView style={ { flex: 1, backgroundColor: '#fff' }}>
             <Tab.Navigator
-                initialRouteName='Graph'
+                initialRouteName='Map'
                 header={null}
                 headerMode='none'
                 tabBar={props => <TabBar {...props} />}
@@ -69,6 +69,9 @@ export const TabNavigator = () => {
                     keyboardHidesTabBar: true 
                 }}
                 backBehavior={'none'}
+                screenOptions={({ route }) => ({
+                    headerShown: false, // Hide the header for each tab
+                })}
             >
             <Tab.Screen
                 name='Graph'

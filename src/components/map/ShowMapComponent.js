@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,7 @@ import {
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
-import floydWarshall from "../../apis/FloydWarshall";
+import fetchRouteData from "../../apis/GetCoords";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -26,7 +26,6 @@ if (Platform.OS === "web") {
   MapView = require("@preflower/react-native-web-maps").default;
 }
 
-const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; //  Google Maps API key
 
 // Create the debounce function
 const debounce = (func, delay) => {
@@ -48,109 +47,43 @@ const debounce = (func, delay) => {
 export default class MapScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = this.props.stateOfMap;
+
+    // this.state = this.props.stateOfMap;
+    this.state = {
+      ...this.props.stateOfMap,
+      showIcon: false, // Add a state variable to control icon visibility
+    };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
-    console.log("Props are ", this.props);
+
   }
 
-  // fetchRouteData(origin, waypoint, destination) {
-  fetchRouteData(originLatLong, waypointLatLong, destinationLatLong) {
-    console.log("Function is called");
-    console.log("Waypoint is", waypointLatLong);
-
-    const origin = `${originLatLong.latitude},${originLatLong.longitude}`;
-    const destination = `${destinationLatLong.latitude},${destinationLatLong.longitude}`;
-    const waypoint = `${waypointLatLong.latitude},${waypointLatLong.longitude}`;
-    // Update the proxy URL to "CORS Anywhere"
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    // Construct the URL for the Google Directions API request
-    const apiUrl = `${proxyUrl}https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
-    //  const apiUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&waypoints=${waypoint}&destination=${destination}&key=${apiKey}`;
-
-    // Make an API request to the Google Directions API
-    fetch(apiUrl)
-      .then((response) => response.text()) // Get the response body as text
-      .then((data) => {
-        const parsedData = JSON.parse(data); // Parse the JSON string into an object
-        if (parsedData.routes && parsedData.routes.length > 0) {
-          // Extract route coordinates from the parsed data
-          const coords = this.extractcoords(
-            parsedData.routes[0].overview_polyline
-          );
-          this.setState({ coords });
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching route:", error);
-      });
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps != this.props) {
-      console.log("Component Updated with props ", this.props);
+  async componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
       this.setState(this.props.stateOfMap);
     }
-    if (prevProps.stateOfMap.plot.draw != this.props.stateOfMap.plot.draw) {
-      console.log("Plot Requested with props ", this.props);
+  
+    if (prevProps.stateOfMap.plot.draw !== this.props.stateOfMap.plot.draw) {
       if (Platform.OS === "web") {
-        floydWarshall(this.props.stateOfMap.markers)
-          .then((best_waypoint) => {
-            console.log("Best waypoint is", best_waypoint);
-            if (best_waypoint) {
-              this.fetchRouteData(
-                this.props.stateOfMap.plot.origin,
-                best_waypoint,
-                this.props.stateOfMap.plot.destination
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
+        try {
+          const coords = await fetchRouteData(
+            this.props.stateOfMap.plot.origin,
+            this.props.stateOfMap.plot.waypoint,
+            this.props.stateOfMap.plot.destination
+          );
+          this.setState({ coords });
+        } catch (error) {
+          console.error('Error fetching COORDS', error);
+        }
       }
     }
   }
+  
 
   componentDidMount() {
-    console.log("Component is mounted with props ", this.props);
     if (Platform.OS === "web") {
       loadGoogleMapsAPI(() => {
         this.setState({ googleMapsLoaded: true });
       });
-    }
-  }
-
-  extractcoords(overviewPolyline) {
-    try {
-      if (
-        overviewPolyline &&
-        window.google &&
-        window.google.maps &&
-        window.google.maps.geometry &&
-        window.google.maps.geometry.encoding
-      ) {
-        // Decode the encoded polyline and return an array of coordinates
-        const points = window.google.maps.geometry.encoding.decodePath(
-          overviewPolyline.points
-        );
-        if (points && points.length > 0) {
-          return points.map((point) => [point.lat(), point.lng()]);
-        } else {
-          console.error("No points found in the decoded polyline");
-          // Return an empty array or handle this case according to your needs
-          return [];
-        }
-      } else {
-        console.error(
-          "Google Maps JavaScript API not loaded or encoding library not available"
-        );
-        // Return an empty array or handle this case according to your needs
-        return [];
-      }
-    } catch (error) {
-      console.error("Error decoding polyline:", error);
-      // Return an empty array or handle this case according to your needs
-      return [];
     }
   }
 
@@ -184,6 +117,10 @@ export default class MapScreen extends Component {
     console.log("Map panned or dragged");
   };
 
+  onPolylineClicked = () => {
+    this.setState(() => ({ showIcon: true }));
+  };
+
   render() {
     const {
       coords,
@@ -193,6 +130,7 @@ export default class MapScreen extends Component {
       markers,
       googleMapsLoaded,
       plot,
+      showIcon
     } = this.state;
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
@@ -215,13 +153,13 @@ export default class MapScreen extends Component {
                 zoomEnabled={true}
                 zoomControlEnabled={true}
                 mapType="terrain"
+                showsPointsOfInterest={false}
               >
                 <MapView.Marker coordinate={origin} title="Origin">
                   <View style={styles.markerContainer}>
                     <img
                       source={custom_pin}
                       style={styles.markerImage}
-                      resizeMode="contain"
                     />
                   </View>
                 </MapView.Marker>
@@ -231,7 +169,6 @@ export default class MapScreen extends Component {
                     <img
                       source={custom_pin}
                       style={styles.markerImage}
-                      resizeMode="contain"
                     />
                   </View>
                 </MapView.Marker>
@@ -245,17 +182,20 @@ export default class MapScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                {console.log("Coords are", coords) ||
-                  (coords && (
+                {coords && (
                     <MapView.Polyline
                       coordinates={coords.map((coord) => ({
                         latitude: coord[0],
                         longitude: coord[1],
                       }))}
-                      strokeWidth={4}
-                      strokeColor="royalblue"
+                      strokeWidth={14}
+                      strokeColor={showIcon?"red":"royalblue"}
+                      tappable={true}
+                      onClick={() => {
+                        this.onPolylineClicked()
+                      }}
                     />
-                  ))}
+                  )}
               </MapView>
               <TouchableOpacity onPress={this.props.onPressMarkers}>
                 <Text>Generate Waypoints</Text>
@@ -283,7 +223,6 @@ export default class MapScreen extends Component {
                   <Image
                     source={custom_pin}
                     style={styles.markerImage}
-                    resizeMode="contain"
                   />
                 </View>
                 </MarkerMob>
@@ -295,7 +234,6 @@ export default class MapScreen extends Component {
                   <Image
                     source={custom_pin}
                     style={styles.markerImage}
-                    resizeMode="contain"
                   />
                 </View>
                 </MarkerMob>
@@ -321,7 +259,7 @@ export default class MapScreen extends Component {
                     ]}
                     destination={destination}
                     apikey={apiKey}
-                    strokeWidth={4}
+                    strokeWidth={14}
                     strokeColor="hotpink"
                   />
                 )}
@@ -350,12 +288,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   markerContainer: {
-    width: 40, // Set the desired width
-    height: 40, // Set the desired height
+    width: 40,
+    height: 40, 
   },
   markerImage: {
     flex: 1,
-    width: undefined, // This makes sure the width is set according to the parent container
-    height: undefined, // This makes sure the height is set according to the parent container
+    width: undefined, 
+    height: undefined,
   },
 });
