@@ -11,7 +11,6 @@ import {
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
-import floydWarshall from "../../apis/FloydWarshall";
 import fetchRouteData from "../../apis/GetCoords";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
@@ -48,7 +47,12 @@ const debounce = (func, delay) => {
 export default class MapScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = this.props.stateOfMap;
+
+    // this.state = this.props.stateOfMap;
+    this.state = {
+      ...this.props.stateOfMap,
+      showIcon: false, // Add a state variable to control icon visibility
+    };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
 
   }
@@ -115,7 +119,7 @@ export default class MapScreen extends Component {
   };
 
   onPolylineClicked = () => {
-    console.log("Polyline pressed:");
+    this.setState(() => ({ showIcon: true }));
   };
 
   render() {
@@ -127,6 +131,7 @@ export default class MapScreen extends Component {
       markers,
       googleMapsLoaded,
       plot,
+      showIcon
     } = this.state;
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
@@ -185,7 +190,7 @@ export default class MapScreen extends Component {
                         longitude: coord[1],
                       }))}
                       strokeWidth={4}
-                      strokeColor="royalblue"
+                      strokeColor={showIcon?"red":"royalblue"}
                       tappable={true}
                       onClick={() => {
                         this.onPolylineClicked()
