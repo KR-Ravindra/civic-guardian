@@ -67,7 +67,6 @@ export default class MapScreen extends Component {
             this.props.stateOfMap.plot.waypoint,
             this.props.stateOfMap.plot.destination
           );
-          console.log("Coords are 68 ", coords);
           this.setState({ coords });
         } catch (error) {
           console.error('Error fetching COORDS', error);
@@ -179,8 +178,7 @@ export default class MapScreen extends Component {
                     description={marker.description}
                   />
                 ))}
-                {console.log("Coords are", coords) ||
-                  (coords && (
+                {coords && (
                     <MapView.Polyline
                       coordinates={coords.map((coord) => ({
                         latitude: coord[0],
@@ -193,7 +191,7 @@ export default class MapScreen extends Component {
                         this.onPolylineClicked()
                       }}
                     />
-                  ))}
+                  )}
               </MapView>
               <TouchableOpacity onPress={this.props.onPressMarkers}>
                 <Text>Generate Waypoints</Text>
@@ -286,12 +284,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   markerContainer: {
-    width: 40, // Set the desired width
-    height: 40, // Set the desired height
+    width: 40,
+    height: 40, 
   },
   markerImage: {
     flex: 1,
-    width: undefined, // This makes sure the width is set according to the parent container
-    height: undefined, // This makes sure the height is set according to the parent container
+    width: undefined, 
+    height: undefined,
   },
 });

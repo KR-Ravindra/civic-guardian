@@ -19,7 +19,6 @@ async function fetchRouteData(originLatLong, waypointLatLong, destinationLatLong
 
       const data = await response.json();
       const coords = extractCoords(data.routes[0].overview_polyline);
-      console.log("Coords are GetCOORDS ", coords);
       return coords;
   } catch (error) {
       console.error("Error fetching route with routes api:", error);
