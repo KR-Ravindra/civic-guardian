@@ -15,7 +15,7 @@ import fetchRouteData from "../../apis/GetCoords";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Colors from "../../style/colors";
 
-
+let LinearGradientWeb,LinearGradientMob;
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -23,13 +23,14 @@ if (Platform.OS === "android") {
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
   MapViewDirectionsMob = require("react-native-maps-directions").default;
+  LinearGradientMob = require("react-native-linear-gradient").default;
 }
 let MapView;
 
 if (Platform.OS === "web") {
   MapView = require("@preflower/react-native-web-maps").default;
+  LinearGradientWeb = require("react-native-web-linear-gradient").default;
 }
-
 
 // Create the debounce function
 const debounce = (func, delay) => {
@@ -58,14 +59,13 @@ export default class MapScreen extends Component {
       showIcon: false, // Add a state variable to control icon visibility
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
-
   }
 
   async componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
       this.setState(this.props.stateOfMap);
     }
-  
+
     if (prevProps.stateOfMap.plot.draw !== this.props.stateOfMap.plot.draw) {
       if (Platform.OS === "web") {
         try {
@@ -76,12 +76,11 @@ export default class MapScreen extends Component {
           );
           this.setState({ coords });
         } catch (error) {
-          console.error('Error fetching COORDS', error);
+          console.error("Error fetching COORDS", error);
         }
       }
     }
   }
-  
 
   componentDidMount() {
     if (Platform.OS === "web") {
@@ -134,7 +133,7 @@ export default class MapScreen extends Component {
       markers,
       googleMapsLoaded,
       plot,
-      showIcon
+      showIcon,
     } = this.state;
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
@@ -161,22 +160,15 @@ export default class MapScreen extends Component {
               >
                 <MapView.Marker coordinate={origin} title="Origin">
                   <View style={styles.markerContainer}>
-                    <img
-                      source={custom_pin}
-                      style={styles.markerImage}
-                    />
+                    <img source={custom_pin} style={styles.markerImage} />
                   </View>
                 </MapView.Marker>
 
                 <MapView.Marker coordinate={destination} title="Destination">
                   <View style={styles.markerContainer}>
-                    <img
-                      source={custom_pin}
-                      style={styles.markerImage}
-                    />
+                    <img source={custom_pin} style={styles.markerImage} />
                   </View>
                 </MapView.Marker>
-                 
 
                 {markers.map((marker, index) => (
                   <MapView.Marker
@@ -187,69 +179,87 @@ export default class MapScreen extends Component {
                   />
                 ))}
                 {coords && (
-                    <MapView.Polyline
-                      coordinates={coords.map((coord) => ({
-                        latitude: coord[0],
-                        longitude: coord[1],
-                      }))}
-                      strokeWidth={14}
-                      strokeColor={showIcon?"red":"royalblue"}
-                      tappable={true}
-                      onClick={() => {
-                        this.onPolylineClicked()
-                      }}
-                    />
-                  )}
+                  <MapView.Polyline
+                    coordinates={coords.map((coord) => ({
+                      latitude: coord[0],
+                      longitude: coord[1],
+                    }))}
+                    strokeWidth={14}
+                    strokeColor={showIcon ? "red" : "royalblue"}
+                    tappable={true}
+                    onClick={() => {
+                      this.onPolylineClicked();
+                    }}
+                  />
+                )}
               </MapView>
 
-              <View style={{flexDirection:'row'}}>
-               <TouchableOpacity
-            style={styles.button}
-            onPress={this.props.onPressPlotter}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <FontAwesome5
-                name="map-marker-alt"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.buttonText}>Generate Way</Text>
-            </View>
-          </TouchableOpacity>
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={this.props.onPressPlotter}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <FontAwesome5
+                      name="map-marker-alt"
+                      size={24}
+                      color={Colors.white}
+                      style={{ marginRight: 10 }}
+                    />
+                    <Text style={styles.buttonText}>Generate Way</Text>
+                  </View>
+                </TouchableOpacity>
 
-          <TouchableOpacity
-          style={{ ...styles.button, width: '40%' }}
+                <TouchableOpacity
+                  style={{
+                    alignItems: "center",
+                    marginTop: 10,
+                    height: 35,
+                    width: "40%",
+                  }}
+                >
+                  <LinearGradientWeb
+                    colors={[
+                      "#FF7518",
+                      "#FF7518",
+                      "#FFC107",
+                      "#FFC107",
+                      "#FFC107",
+                    ]}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    style={{
+                      padding: 8,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <FontAwesome5
+                        name="map-pin"
+                        size={24}
+                        color={Colors.white}
+                        style={{ marginRight: 5 }}
+                      />
+                      <Text style={styles.buttonText}>Region</Text>
+                      <FontAwesome5
+                        name="grip-lines"
+                        size={24}
+                        color={Colors.white}
+                        style={{ marginleft: 10 }}
+                      />
+                      <Text style={styles.buttonText}>{region.latitude}</Text>
+                      <FontAwesome5
+                        name="grip-lines-vertical"
+                        size={24}
+                        color={Colors.white}
+                        style={{ marginleft: 10 }}
+                      />
 
-          >
-            <View style={{ flexDirection: "row" }}>
-              <FontAwesome5
-                name="map-pin"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 5 }}
-              />
-              <Text style={styles.buttonText}>Region</Text>
-              <FontAwesome5
-                name="grip-lines"
-                size={24}
-                color={Colors.white}
-                style={{ marginleft: 10 }}
-              />
-              <Text style={styles.buttonText}>{region.latitude}</Text>
-              <FontAwesome5
-                name="grip-lines-vertical"
-                size={24}
-                color={Colors.white}
-                style={{ marginleft: 10 }}
-              />
-
-              <Text style={styles.buttonText}>{region.longitude}</Text>
-
-            
-            </View>
-          </TouchableOpacity>
-          </View>
+                      <Text style={styles.buttonText}>{region.longitude}</Text>
+                    </View>
+                  </LinearGradientWeb>
+                </TouchableOpacity>
+              </View>
             </View>
           ) : Platform.OS === "android" ? (
             <View style={styles.container}>
@@ -263,28 +273,16 @@ export default class MapScreen extends Component {
                 mapType="terrain"
                 customMapStyle={MapStyle}
               >
-                <MarkerMob
-                  coordinate={origin}
-                  title="Origin">
+                <MarkerMob coordinate={origin} title="Origin">
                   <View style={styles.markerContainer}>
-                  <Image
-                    source={custom_pin}
-                    style={styles.markerImage}
-                  />
-                </View>
+                    <Image source={custom_pin} style={styles.markerImage} />
+                  </View>
                 </MarkerMob>
-                <MarkerMob
-                  coordinate={destination}
-                  title="Destination"
-                  >
+                <MarkerMob coordinate={destination} title="Destination">
                   <View style={styles.markerContainer}>
-                  <Image
-                    source={custom_pin}
-                    style={styles.markerImage}
-                  />
-                </View>
+                    <Image source={custom_pin} style={styles.markerImage} />
+                  </View>
                 </MarkerMob>
-             
 
                 {console.log("Markers are ", markers) ||
                   markers.map((marker, index) => (
@@ -311,54 +309,74 @@ export default class MapScreen extends Component {
                   />
                 )}
               </MapViewMob>
-              <View style={{flexDirection:'row'}}>
-               <TouchableOpacity
-            style={styles.button}
-            onPress={this.props.onPressPlotter}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <FontAwesome5
-                name="map-marker-alt"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.buttonText}>Generate Way</Text>
-            </View>
-          </TouchableOpacity>
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={this.props.onPressPlotter}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <FontAwesome5
+                      name="map-marker-alt"
+                      size={24}
+                      color={Colors.white}
+                      style={{ marginRight: 10 }}
+                    />
+                    <Text style={styles.buttonText}>Generate Way</Text>
+                  </View>
+                </TouchableOpacity>
+                
 
-          <TouchableOpacity
-          style={{ ...styles.button, width: '40%' }}
+                {/* <TouchableOpacity
+                  style={{
+                    alignItems: "center",
+                    margin: 5,
+                    height: 35,
+                    width: "40%",
+                  }}
+                >
+                  <LinearGradientMob
+                    colors={[
+                      "#FF7518",
+                      "#FF7518",
+                      "#FFC107",
+                      "#FFC107",
+                      "#FFC107",
+                    ]}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    style={{
+                      padding: 8,
 
-          >
-            <View style={{ flexDirection: "row" }}>
-              <FontAwesome5
-                name="map-pin"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 5 }}
-              />
-              <Text style={styles.buttonText}>Region</Text>
-              <FontAwesome5
-                name="grip-lines"
-                size={24}
-                color={Colors.white}
-                style={{ marginleft: 10 }}
-              />
-              <Text style={styles.buttonText}>{region.latitude}</Text>
-              <FontAwesome5
-                name="grip-lines-vertical"
-                size={24}
-                color={Colors.white}
-                style={{ marginleft: 10 }}
-              />
+                      borderRadius: 10,
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <FontAwesome5
+                        name="map-pin"
+                        size={24}
+                        color={Colors.white}
+                        style={{ marginRight: 5 }}
+                      />
+                      <Text style={styles.buttonText}>Region</Text>
+                      <FontAwesome5
+                        name="grip-lines"
+                        size={24}
+                        color={Colors.white}
+                        style={{ marginleft: 10 }}
+                      />
+                      <Text style={styles.buttonText}>{region.latitude}</Text>
+                      <FontAwesome5
+                        name="grip-lines-vertical"
+                        size={24}
+                        color={Colors.white}
+                        style={{ marginleft: 10 }}
+                      />
 
-              <Text style={styles.buttonText}>{region.longitude}</Text>
-
-            
-            </View>
-          </TouchableOpacity>
-          </View>    
+                      <Text style={styles.buttonText}>{region.longitude}</Text>
+                    </View>
+                  </LinearGradientMob>
+                </TouchableOpacity> */}
+              </View>
             </View>
           ) : (
             <Text>LOADING....</Text>
@@ -378,17 +396,17 @@ const styles = StyleSheet.create({
   },
   markerContainer: {
     width: 40,
-    height: 40, 
+    height: 40,
   },
   markerImage: {
     flex: 1,
-    width: undefined, 
+    width: undefined,
     height: undefined,
   },
   button: {
     backgroundColor: Colors.orange,
     padding: 8,
-    alignItems:'center',
+    alignItems: "center",
     margin: 10,
     borderRadius: 10,
     height: 35,
@@ -399,7 +417,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
     textAlign: "center",
     fontWeight: "bold",
-    marginRight:5,
-    marginLeft:5
+    marginRight: 5,
+    marginLeft: 5,
   },
 });
