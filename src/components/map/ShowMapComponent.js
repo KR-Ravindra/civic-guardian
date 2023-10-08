@@ -12,6 +12,10 @@ import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
+import { FontAwesome5 } from "@expo/vector-icons";
+import Colors from "../../style/colors";
+
+
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -197,12 +201,55 @@ export default class MapScreen extends Component {
                     />
                   )}
               </MapView>
-              <TouchableOpacity onPress={this.props.onPressMarkers}>
-                <Text>Generate Waypoints</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.props.onPressPlotter}>
-                <Text>Generate Way</Text>
-              </TouchableOpacity>
+
+              <View style={{flexDirection:'row'}}>
+               <TouchableOpacity
+            style={styles.button}
+            onPress={this.props.onPressPlotter}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <FontAwesome5
+                name="map-marker-alt"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Generate Way</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          style={{ ...styles.button, width: '40%' }}
+
+          >
+            <View style={{ flexDirection: "row" }}>
+              <FontAwesome5
+                name="map-pin"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 5 }}
+              />
+              <Text style={styles.buttonText}>Region</Text>
+              <FontAwesome5
+                name="grip-lines"
+                size={24}
+                color={Colors.white}
+                style={{ marginleft: 10 }}
+              />
+              <Text style={styles.buttonText}>{region.latitude}</Text>
+              <FontAwesome5
+                name="grip-lines-vertical"
+                size={24}
+                color={Colors.white}
+                style={{ marginleft: 10 }}
+              />
+
+              <Text style={styles.buttonText}>{region.longitude}</Text>
+
+            
+            </View>
+          </TouchableOpacity>
+          </View>
             </View>
           ) : Platform.OS === "android" ? (
             <View style={styles.container}>
@@ -264,12 +311,54 @@ export default class MapScreen extends Component {
                   />
                 )}
               </MapViewMob>
-              <TouchableOpacity onPress={this.props.onPressMarkers}>
-                <Text>Generate Waypoints</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.props.onPressPlotter}>
-                <Text>Generate Way</Text>
-              </TouchableOpacity>
+              <View style={{flexDirection:'row'}}>
+               <TouchableOpacity
+            style={styles.button}
+            onPress={this.props.onPressPlotter}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <FontAwesome5
+                name="map-marker-alt"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Generate Way</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          style={{ ...styles.button, width: '40%' }}
+
+          >
+            <View style={{ flexDirection: "row" }}>
+              <FontAwesome5
+                name="map-pin"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 5 }}
+              />
+              <Text style={styles.buttonText}>Region</Text>
+              <FontAwesome5
+                name="grip-lines"
+                size={24}
+                color={Colors.white}
+                style={{ marginleft: 10 }}
+              />
+              <Text style={styles.buttonText}>{region.latitude}</Text>
+              <FontAwesome5
+                name="grip-lines-vertical"
+                size={24}
+                color={Colors.white}
+                style={{ marginleft: 10 }}
+              />
+
+              <Text style={styles.buttonText}>{region.longitude}</Text>
+
+            
+            </View>
+          </TouchableOpacity>
+          </View>    
             </View>
           ) : (
             <Text>LOADING....</Text>
@@ -295,5 +384,22 @@ const styles = StyleSheet.create({
     flex: 1,
     width: undefined, 
     height: undefined,
+  },
+  button: {
+    backgroundColor: Colors.orange,
+    padding: 8,
+    alignItems:'center',
+    margin: 10,
+    borderRadius: 10,
+    height: 35,
+    width: "20%",
+  },
+
+  buttonText: {
+    color: Colors.white,
+    textAlign: "center",
+    fontWeight: "bold",
+    marginRight:5,
+    marginLeft:5
   },
 });
