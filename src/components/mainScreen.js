@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text,Platform } from "react-native";
 import Colors from "../style/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Manual from "./graph/manual"
@@ -9,8 +9,12 @@ const MainScreen = ({ navigation }) => {
   const [isModalVisible,setIsModalVisible]=useState(false)
 
   const goToTabNavigator = () => {
-    // navigation.navigate('Tab');
-    navigation.navigate("SplitScreen");
+    if (Platform.OS === "web") {
+        navigation.navigate("SplitScreen");
+    }
+    if (Platform.OS === "android") {
+        navigation.navigate('Tab');
+      }
   };
 
   const  toggleModal = () => {
