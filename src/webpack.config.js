@@ -10,9 +10,6 @@ module.exports = {
       'react-native-maps-directions': path.resolve(__dirname, '../node_modules/react-native-maps-directions'), // For Mobile
       'react-vis-network-graph':path.resolve(__dirname,'../node_modules/react-vis-network-graph'),//For web
       'react-native-vis-network':path.resolve(__dirname,'../node_modules/react-native-vis-network'),//for mobile
-      'react-native-linear-gradient':path.resolve(__dirname,'../node_modules/react-native-linear-gradient'),//for mobile
-      'react-native-web-linear-gradient':path.resolve(__dirname,'../node_modules/react-native-web-linear-gradient')//for web
-
     },
   },
 };
