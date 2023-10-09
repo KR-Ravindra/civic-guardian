@@ -34,11 +34,15 @@ export const MainStackNavigator = ({}) => {
     />
     <Stack.Screen
       name='MapScreen'
-      component={(props) => <MapScreen {...props} navigation={props.navigation} />}
+      component={MapScreen}
+
+    //   component={(props) => <MapScreen {...props} navigation={props.navigation} />}
     />
      <Stack.Screen
       name='MainMapScreen'
-      component={(props) => <MainMapScreen {...props} navigation={props.navigation} />}
+      component={MainMapScreen}
+
+    //   component={(props) => <MainMapScreen {...props} navigation={props.navigation} />}
     />
 
   </Stack.Navigator>
