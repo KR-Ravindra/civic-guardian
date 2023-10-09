@@ -6,6 +6,7 @@ import {
   Platform,
   TouchableOpacity,
   Image,
+  Button
 } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
@@ -15,7 +16,6 @@ import fetchRouteData from "../../apis/GetCoords";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Colors from "../../style/colors";
 
-let LinearGradientWeb,LinearGradientMob;
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -23,13 +23,11 @@ if (Platform.OS === "android") {
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
   MapViewDirectionsMob = require("react-native-maps-directions").default;
-  LinearGradientMob = require("react-native-linear-gradient").default;
 }
 let MapView;
 
 if (Platform.OS === "web") {
   MapView = require("@preflower/react-native-web-maps").default;
-  LinearGradientWeb = require("react-native-web-linear-gradient").default;
 }
 
 // Create the debounce function
@@ -60,6 +58,11 @@ export default class MapScreen extends Component {
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
   }
+
+  goNavigate = () => {
+    this.props.navigation.navigate('NewSplitScreen');
+  }
+
 
   async componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
@@ -194,71 +197,15 @@ export default class MapScreen extends Component {
                 )}
               </MapView>
 
-              <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={this.props.onPressPlotter}
-                >
-                  <View style={{ flexDirection: "row" }}>
-                    <FontAwesome5
-                      name="map-marker-alt"
-                      size={24}
-                      color={Colors.white}
-                      style={{ marginRight: 10 }}
-                    />
-                    <Text style={styles.buttonText}>Generate Way</Text>
-                  </View>
-                </TouchableOpacity>
+              <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
+                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                  <Button title="Simulate"  color={Colors.orange}onPress={this.goNavigate} />
 
-                <TouchableOpacity
-                  style={{
-                    alignItems: "center",
-                    marginTop: 10,
-                    height: 35,
-                    width: "40%",
-                  }}
-                >
-                  <LinearGradientWeb
-                    colors={[
-                      "#FF7518",
-                      "#FF7518",
-                      "#FFC107",
-                      "#FFC107",
-                      "#FFC107",
-                    ]}
-                    start={{ x: 0, y: 0.5 }}
-                    end={{ x: 1, y: 0.5 }}
-                    style={{
-                      padding: 8,
-                      borderRadius: 10,
-                    }}
-                  >
-                    <View style={{ flexDirection: "row" }}>
-                      <FontAwesome5
-                        name="map-pin"
-                        size={24}
-                        color={Colors.white}
-                        style={{ marginRight: 5 }}
-                      />
-                      <Text style={styles.buttonText}>Region</Text>
-                      <FontAwesome5
-                        name="grip-lines"
-                        size={24}
-                        color={Colors.white}
-                        style={{ marginleft: 10 }}
-                      />
-                      <Text style={styles.buttonText}>{region.latitude}</Text>
-                      <FontAwesome5
-                        name="grip-lines-vertical"
-                        size={24}
-                        color={Colors.white}
-                        style={{ marginleft: 10 }}
-                      />
-
-                      <Text style={styles.buttonText}>{region.longitude}</Text>
+                    <View style={styles.rgnView}>
+                      <Text style={styles.rgnText}>Region:</Text>
+                      <Text style={styles.rgnText}>{region.latitude}</Text>
+                      <Text style={styles.rgnText}>{region.longitude}</Text>
                     </View>
-                  </LinearGradientWeb>
-                </TouchableOpacity>
               </View>
             </View>
           ) : Platform.OS === "android" ? (
@@ -309,73 +256,13 @@ export default class MapScreen extends Component {
                   />
                 )}
               </MapViewMob>
-              <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={this.props.onPressPlotter}
-                >
-                  <View style={{ flexDirection: "row" }}>
-                    <FontAwesome5
-                      name="map-marker-alt"
-                      size={24}
-                      color={Colors.white}
-                      style={{ marginRight: 10 }}
-                    />
-                    <Text style={styles.buttonText}>Generate Way</Text>
-                  </View>
-                </TouchableOpacity>
-                
-
-                {/* <TouchableOpacity
-                  style={{
-                    alignItems: "center",
-                    margin: 5,
-                    height: 35,
-                    width: "40%",
-                  }}
-                >
-                  <LinearGradientMob
-                    colors={[
-                      "#FF7518",
-                      "#FF7518",
-                      "#FFC107",
-                      "#FFC107",
-                      "#FFC107",
-                    ]}
-                    start={{ x: 0, y: 0.5 }}
-                    end={{ x: 1, y: 0.5 }}
-                    style={{
-                      padding: 8,
-
-                      borderRadius: 10,
-                    }}
-                  >
-                    <View style={{ flexDirection: "row" }}>
-                      <FontAwesome5
-                        name="map-pin"
-                        size={24}
-                        color={Colors.white}
-                        style={{ marginRight: 5 }}
-                      />
-                      <Text style={styles.buttonText}>Region</Text>
-                      <FontAwesome5
-                        name="grip-lines"
-                        size={24}
-                        color={Colors.white}
-                        style={{ marginleft: 10 }}
-                      />
-                      <Text style={styles.buttonText}>{region.latitude}</Text>
-                      <FontAwesome5
-                        name="grip-lines-vertical"
-                        size={24}
-                        color={Colors.white}
-                        style={{ marginleft: 10 }}
-                      />
-
-                      <Text style={styles.buttonText}>{region.longitude}</Text>
+              <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
+                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                    <View style={styles.rgnView}>
+                      <Text style={styles.rgnText}>Region:</Text>
+                      <Text style={styles.rgnText}>{region.latitude}</Text>
+                      <Text style={styles.rgnText}>{region.longitude}</Text>
                     </View>
-                  </LinearGradientMob>
-                </TouchableOpacity> */}
               </View>
             </View>
           ) : (
@@ -403,21 +290,12 @@ const styles = StyleSheet.create({
     width: undefined,
     height: undefined,
   },
-  button: {
-    backgroundColor: Colors.orange,
-    padding: 8,
-    alignItems: "center",
-    margin: 10,
-    borderRadius: 10,
-    height: 35,
-    width: "20%",
+ 
+  rgnText:{
+    // fontWeight: "bold",
+    fontSize:12,
+    color:'#666666',
   },
-
-  buttonText: {
-    color: Colors.white,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginRight: 5,
-    marginLeft: 5,
-  },
+  rgnView:{ flexDirection: "row",alignItems: "flex-end"},
+ 
 });
