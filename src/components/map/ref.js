@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Platform, Button } from 'react-native';
 import ErrorBoundary from '../errorBoundry';
 import ShowMapScreen from './ShowMapComponent';
 import getHubs from '../../apis/GetHubs';
-import floydWarshallNode from '../../apis/FloydWarshallNode';
+import floydWarshall from '../../apis/FloydWarshallNode';
 
 const MainMapScreen = () => {
     const dummyMarkers = [
@@ -58,38 +58,82 @@ const MainMapScreen = () => {
         description: "Marker Description 5",
       },
     ];
-    const origin = { "id": 99, "label": "Source", "title": "Source","latlng": { "latitude": 33.843663, "longitude": -117.945171 }, "latitude": 33.843663, "longitude": -117.945171 }
-    const destination = { "id": 100, "label": "Destination", "title": "Destination","latlng": { "latitude": 33.8252956, "longitude": -117.8307728 },  "latitude": 33.8252956, "longitude": -117.8307728};
-    localStorage.setItem("origin", JSON.stringify(origin));
-    localStorage.setItem("destination", JSON.stringify(destination));
+
+    const [newMarkers,setNewMarkers] = useState(null)
     const [isLoading, setIsLoading] = useState(false);
-    const [bestWaypoint, setBestWaypoint] = useState(null);
-    const [stateOfMap, setStateOfMap] = useState({
-      coords: [],
-      region: {
-        latitude: destination.latitude, // Latitude for fullerton
-        longitude: destination.longitude, // Longitude for fullerton
-        latitudeDelta: 0.05, // Adjust this value for zoom level
-        longitudeDelta: 0.045, // Adjust this value for zoom level
-      },
-      origin: origin, // Latitude and longitude for the origin marker
-      destination: destination, // Latitude and longitude for the destination marker
-      markers: [],
-      googleMapsLoaded: false,
-      plot: {
-        draw: false,
-        origin: { latitude: origin.latitude, longitude: origin.longitude },
-        destination: { latitude: destination.latitude, longitude: destination.longitude },
-        waypoint: {latitude: 33.8589565, longitude: -117.9589782}
+    const [bestWaypoint, setBestWaypoint] = useState({});
+    let origin = null;
+    let destination = null;
+
+    const [stateOfMap, setStateOfMap] = useState({});
+    useEffect(() => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Current location is ", position.coords);
+          const { latitude, longitude } = position.coords;
+          console.log("Registered location is ", latitude, longitude);
+          const currentLocation = { "latitude": latitude, "longitude": longitude };
+          console.log("Current location is ", currentLocation);
+          setNewMarkers(getHubs(currentLocation))
+        },
+        (error) => {
+          console.log("Error getting current location:", error);
+        }
+      )
+    }, []);
+
+    useEffect(() => {
+      if (newMarkers) {
+        console.log("Second Effect is triggered")
+      const autoDestination = dummyMarkers[dummyMarkers.length - 1];
+      const autoOrigin = dummyMarkers[dummyMarkers.length - 2];
+      
+      console.log("Auto Origin is ", autoOrigin.latlng.latitude)
+
+      const destination = { "latitude": autoDestination.latlng.latitude, "longitude": autoDestination.latlng.longitude};
+      const origin = { "latitude": autoOrigin.latlng.latitude, "longitude": autoOrigin.latlng.longitude};
+      console.log("Destination marker:", destination);
+      console.log("Origin marker:", origin);
+      console.log("New Markers are ", newMarkers)
       }
-    })
-    const newMarkers = getHubs(stateOfMap.region);
+    }, [newMarkers]);
+
+    useEffect(() => {
+      if (origin && destination) {
+        console.log("Third Effect is triggered")
+        setStateOfMap({
+          coords: [],
+          region: {
+            latitude: destination.latitude,
+            longitude: destination.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+          origin: origin,
+          destination: destination,
+          markers: [],
+          googleMapsLoaded: false,
+          plot: {
+            draw: false,
+            origin: { latitude: origin.latitude, longitude: origin.longitude },
+            destination: { latitude: destination.latitude, longitude: destination.longitude },
+            waypoint: {latitude: 33.8589565, longitude: -117.9589782}
+          }
+        });
+        console.log("State of map is ", stateOfMap)
+      }
+    }, [newMarkers]);
+
+    if (!isLoading) {
+      console.log("Loading is False")
+      return <Text> Loading... </Text>;
+    }
 
     const handleGenerateWay = () => {
       setIsLoading(true);
       // Call the API to get the best waypoint
       // Once the response is received, set the bestWaypoint state variable and setIsLoading to false
-      floydWarshallNode(newMarkers).then((response) => {
+      floydWarshall(newMarkers).then((response) => {
         console.log("Response from API is ", response);
         setBestWaypoint(response);
         setIsLoading(false);
@@ -105,11 +149,13 @@ const MainMapScreen = () => {
         <View style={styles.container}>
         <ErrorBoundary>
           <View style={styles.container}>
+           { isLoading ? (<Text>Loading...</Text>) : (
           <ShowMapScreen 
             stateOfMap={stateOfMap} 
             onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: dummyMarkers, googleMapsLoaded: true} )}}
             onPressPlotter={() => { handleGenerateWay(); }}
-             ></ShowMapScreen>
+             ></ShowMapScreen>)}
+            {isLoading && console.log("Loading with best waypoint as ", bestWaypoint.latlng)}
           </View>
         </ErrorBoundary>
         </View>

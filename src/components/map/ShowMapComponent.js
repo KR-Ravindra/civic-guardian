@@ -12,7 +12,7 @@ import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
-import floydWarshall from "../../apis/FloydWarshall";
+import floydWarshallNode from "../../apis/FloydWarshallNode";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -52,7 +52,8 @@ export default class MapScreen extends Component {
     // this.state = this.props.stateOfMap;
     this.state = {
       ...this.props.stateOfMap,
-      showIcon: false, // Add a state variable to control icon visibility
+      showIcon: false,
+      waypoint: {}, // Add a state variable to control icon visibility
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
 
@@ -63,16 +64,17 @@ export default class MapScreen extends Component {
       this.setState(this.props.stateOfMap);
     }
   
-    if (prevProps.stateOfMap.plot.draw !== this.props.stateOfMap.plot.draw) {
+    if (prevProps.stateOfMap.plot.waypoint !== this.props.stateOfMap.plot.waypoint && Object.keys(this.props.stateOfMap.plot.waypoint).length !== 0) {
       if (Platform.OS === "web") {
         try {
-          console.log(" Floyd warhsall called and response is ", floydWarshall(this.props.stateOfMap.markers))
-          const coords = await fetchRouteData(
+          localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          console.log("Component Updated Successfully")
+          const newcoords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
             this.props.stateOfMap.plot.waypoint,
             this.props.stateOfMap.plot.destination
           );
-          this.setState({ coords });
+          this.setState({ coords: newcoords });
         } catch (error) {
           console.error('Error fetching COORDS', error);
         }
@@ -121,6 +123,38 @@ export default class MapScreen extends Component {
 
   onPolylineClicked = () => {
     this.setState(() => ({ showIcon: true }));
+    const hub = JSON.parse(localStorage.getItem('hub'));
+    console.log("Hub array from local storage:", hub);
+    console.log("Waypoint:", this.props.stateOfMap.plot.waypoint.latitude);
+    const hasWaypoint = hub.some((object) => {
+      console.log(object.latlng.latitude)
+      return object.latlng.latitude == this.props.stateOfMap.plot.waypoint.latitude;
+    });
+    const filteredHub = hub.filter((object) => {
+      if (object.latlng.latitude == this.props.stateOfMap.plot.waypoint.latitude) {
+        return false;
+      }
+      return true;
+    });
+    console.log("Filtered hub array:", filteredHub);
+    localStorage.setItem('hub', JSON.stringify(filteredHub));
+    console.log("Hub array has waypoint:", hasWaypoint);
+    floydWarshallNode(filteredHub).then(async(response) => {
+      this.props.stateOfMap.plot.waypoint = response;
+      localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      console.log("Output from floydWarshallNode:", response);
+      const newcoords = await fetchRouteData(
+        this.props.stateOfMap.plot.origin,
+        this.props.stateOfMap.plot.waypoint,
+        this.props.stateOfMap.plot.destination
+      );
+      this.setState({ coords: newcoords });
+      this.setState({ showIcon: false });
+    }).catch((error) => {
+      console.log("Error from API is ", error);
+      alert("No More Waypoints left! Please consider the last one");
+    });
+
   };
 
   render() {
