@@ -6,17 +6,24 @@ import {
   Platform,
   TouchableOpacity,
   Image,
+  Button
 } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
+
+import { FontAwesome5 } from "@expo/vector-icons";
+import Colors from "../../style/colors";
+
 import floydWarshallNode from "../../apis/FloydWarshallNode";
+
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
-if (Platform.OS === "android") {
+if (Platform.OS === "android" ||Platform.OS === "ios" ) 
+  {
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
   MapViewDirectionsMob = require("react-native-maps-directions").default;
@@ -26,7 +33,6 @@ let MapView;
 if (Platform.OS === "web") {
   MapView = require("@preflower/react-native-web-maps").default;
 }
-
 
 // Create the debounce function
 const debounce = (func, delay) => {
@@ -56,15 +62,21 @@ export default class MapScreen extends Component {
       waypoint: {}, // Add a state variable to control icon visibility
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
-
   }
+
+  goNavigate = () => {
+    this.props.navigation.navigate('NewSplitScreen');
+  }
+
 
   async componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
       this.setState(this.props.stateOfMap);
     }
+
   
     if (prevProps.stateOfMap.plot.waypoint !== this.props.stateOfMap.plot.waypoint && Object.keys(this.props.stateOfMap.plot.waypoint).length !== 0) {
+
       if (Platform.OS === "web") {
         try {
           localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
@@ -76,12 +88,11 @@ export default class MapScreen extends Component {
           );
           this.setState({ coords: newcoords });
         } catch (error) {
-          console.error('Error fetching COORDS', error);
+          console.error("Error fetching COORDS", error);
         }
       }
     }
   }
-  
 
   componentDidMount() {
     if (Platform.OS === "web") {
@@ -166,7 +177,7 @@ export default class MapScreen extends Component {
       markers,
       googleMapsLoaded,
       plot,
-      showIcon
+      showIcon,
     } = this.state;
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
@@ -193,22 +204,15 @@ export default class MapScreen extends Component {
               >
                 <MapView.Marker coordinate={origin} title="Origin">
                   <View style={styles.markerContainer}>
-                    <img
-                      source={custom_pin}
-                      style={styles.markerImage}
-                    />
+                    <img source={custom_pin} style={styles.markerImage} />
                   </View>
                 </MapView.Marker>
 
                 <MapView.Marker coordinate={destination} title="Destination">
                   <View style={styles.markerContainer}>
-                    <img
-                      source={custom_pin}
-                      style={styles.markerImage}
-                    />
+                    <img source={custom_pin} style={styles.markerImage} />
                   </View>
                 </MapView.Marker>
-                 
 
                 {markers.map((marker, index) => (
                   <MapView.Marker
@@ -219,28 +223,33 @@ export default class MapScreen extends Component {
                   />
                 ))}
                 {coords && (
-                    <MapView.Polyline
-                      coordinates={coords.map((coord) => ({
-                        latitude: coord[0],
-                        longitude: coord[1],
-                      }))}
-                      strokeWidth={14}
-                      strokeColor={showIcon?"red":"royalblue"}
-                      tappable={true}
-                      onClick={() => {
-                        this.onPolylineClicked()
-                      }}
-                    />
-                  )}
+                  <MapView.Polyline
+                    coordinates={coords.map((coord) => ({
+                      latitude: coord[0],
+                      longitude: coord[1],
+                    }))}
+                    strokeWidth={14}
+                    strokeColor={showIcon ? "red" : "royalblue"}
+                    tappable={true}
+                    onClick={() => {
+                      this.onPolylineClicked();
+                    }}
+                  />
+                )}
               </MapView>
-              <TouchableOpacity onPress={this.props.onPressMarkers}>
-                <Text>Generate Waypoints</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.props.onPressPlotter}>
-                <Text>Generate Way</Text>
-              </TouchableOpacity>
+
+              <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
+                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                  <Button title="Simulate"  color={Colors.orange}onPress={this.goNavigate} />
+
+                    <View style={styles.rgnView}>
+                      <Text style={styles.rgnText}>Region:</Text>
+                      <Text style={styles.rgnText}>{region.latitude}</Text>
+                      <Text style={styles.rgnText}>{region.longitude}</Text>
+                    </View>
+              </View>
             </View>
-          ) : Platform.OS === "android" ? (
+          ) : Platform.OS === "android" || Platform.OS==='ios' ? (
             <View style={styles.container}>
               <MapViewMob
                 style={styles.map}
@@ -252,28 +261,16 @@ export default class MapScreen extends Component {
                 mapType="terrain"
                 customMapStyle={MapStyle}
               >
-                <MarkerMob
-                  coordinate={origin}
-                  title="Origin">
+                <MarkerMob coordinate={origin} title="Origin">
                   <View style={styles.markerContainer}>
-                  <Image
-                    source={custom_pin}
-                    style={styles.markerImage}
-                  />
-                </View>
+                    <Image source={custom_pin} style={styles.markerImage} />
+                  </View>
                 </MarkerMob>
-                <MarkerMob
-                  coordinate={destination}
-                  title="Destination"
-                  >
+                <MarkerMob coordinate={destination} title="Destination">
                   <View style={styles.markerContainer}>
-                  <Image
-                    source={custom_pin}
-                    style={styles.markerImage}
-                  />
-                </View>
+                    <Image source={custom_pin} style={styles.markerImage} />
+                  </View>
                 </MarkerMob>
-             
 
                 {console.log("Markers are ", markers) ||
                   markers.map((marker, index) => (
@@ -300,12 +297,14 @@ export default class MapScreen extends Component {
                   />
                 )}
               </MapViewMob>
-              <TouchableOpacity onPress={this.props.onPressMarkers}>
-                <Text>Generate Waypoints</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this.props.onPressPlotter}>
-                <Text>Generate Way</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
+                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                    <View style={styles.rgnView}>
+                      <Text style={styles.rgnText}>Region:</Text>
+                      <Text style={styles.rgnText}>{region.latitude}</Text>
+                      <Text style={styles.rgnText}>{region.longitude}</Text>
+                    </View>
+              </View>
             </View>
           ) : (
             <Text>LOADING....</Text>
@@ -325,11 +324,19 @@ const styles = StyleSheet.create({
   },
   markerContainer: {
     width: 40,
-    height: 40, 
+    height: 40,
   },
   markerImage: {
     flex: 1,
-    width: undefined, 
+    width: undefined,
     height: undefined,
   },
+ 
+  rgnText:{
+    // fontWeight: "bold",
+    fontSize:12,
+    color:'#666666',
+  },
+  rgnView:{ flexDirection: "row",alignItems: "flex-end"},
+ 
 });

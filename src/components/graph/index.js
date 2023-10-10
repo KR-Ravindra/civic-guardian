@@ -23,7 +23,6 @@ const GraphScreen = () => {
   const [step4, setStep4] = useState(false);
   const [step5, setStep5] = useState(false);
   const [simulation, setSimulation] = useState(false);
-  const [isModalVisible,setIsModalVisible]=useState(false)
 
   const options = {
     interaction: {
@@ -176,14 +175,7 @@ const showToast = (message) => {
   const wait = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
-const  toggleModal = () => {
-  setIsModalVisible(true)
-};
 
-
-const closeModal = () => {
-  setIsModalVisible(false);
-};
 
   const onSimulation = () => {
     setSimulation(true);
@@ -233,17 +225,6 @@ const closeModal = () => {
     <View style={styles.container}>
       <ErrorBoundary>
       <ToastProvider/>
-      <TouchableOpacity onPress={()=>{toggleModal()}} style={styles.button}>
-      <View style={{ flexDirection: "row" }}>
-              <FontAwesome
-                name="graduation-cap"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.buttonText}>Learn</Text>
-            </View>
-      </TouchableOpacity>
         {!simulation && (
           <TouchableOpacity
             style={styles.button}
@@ -262,7 +243,6 @@ const closeModal = () => {
             </View>
           </TouchableOpacity>
         )}
-         {isModalVisible && <Manual isVisible={isModalVisible} onClosePress={()=>closeModal()}/>}
 
         {step1 && (
           <Graph
@@ -345,14 +325,7 @@ const styles = StyleSheet.create({
     padding: 8,
     margin: 5,
     borderRadius: 5,
-    height: 35,
-    width: "28%",
-  },
-  disableBtn: {
-    backgroundColor: Colors.grey,
-    padding: 8,
-    margin: 5,
-    borderRadius: 5,
+    alignItems:'center',
     height: 35,
     width: "20%",
   },

@@ -5,7 +5,7 @@ import ShowMapScreen from './ShowMapComponent';
 import getHubs from '../../apis/GetHubs';
 import floydWarshallNode from '../../apis/FloydWarshallNode';
 
-const MainMapScreen = () => {
+const MainMapScreen = ({navigation}) => {
     const dummyMarkers = [
       {
         latlng: {
@@ -109,6 +109,8 @@ const MainMapScreen = () => {
             stateOfMap={stateOfMap} 
             onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: dummyMarkers, googleMapsLoaded: true} )}}
             onPressPlotter={() => { handleGenerateWay(); }}
+            navigation={navigation}
+
              ></ShowMapScreen>
           </View>
         </ErrorBoundary>

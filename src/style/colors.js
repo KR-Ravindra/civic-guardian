@@ -5,6 +5,7 @@ const Colors = {
     // orange:'#FF5733',
     // orange:'#FF5F1F',
     orange:'#FF7518',
+    lightOrange:'#FFB38A',
     grey:'#B8B8B8'
   };
   
