@@ -69,7 +69,7 @@ async def just_floyd_warshall(graph, source, destination):
                 if graph[i][j]["value"] > graph[i][k]["value"] + graph[k][j]["value"]:
                     graph[i][j]["value"] = graph[i][k]["value"] + graph[k][j]["value"]
                     graph[i][j]["via"] = graph[k][j]["from"]
-    return graph
+    return {"fwmatrix": graph}
 
 async def best_node(data):
     # sources = []
@@ -83,7 +83,7 @@ async def best_node(data):
                 #     each_inner_node["via"] = random.choice(sources)
                 #     print(f"Randomly selected {each_inner_node['via']} as via")
                 #     sources.remove(each_inner_node["via"])
-                    return each_inner_node
+                    return {"node": each_inner_node}
             # else:
             #     sources.append(each_inner_node["from"])
     return "No Path found"

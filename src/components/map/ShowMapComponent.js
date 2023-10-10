@@ -12,6 +12,7 @@ import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
 import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
+import floydWarshall from "../../apis/FloydWarshall";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -65,6 +66,7 @@ export default class MapScreen extends Component {
     if (prevProps.stateOfMap.plot.draw !== this.props.stateOfMap.plot.draw) {
       if (Platform.OS === "web") {
         try {
+          console.log(" Floyd warhsall called and response is ", floydWarshall(this.props.stateOfMap.markers))
           const coords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
             this.props.stateOfMap.plot.waypoint,

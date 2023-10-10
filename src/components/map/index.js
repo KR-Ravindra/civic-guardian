@@ -80,7 +80,20 @@ const MainMapScreen = () => {
       }
     })
     const newMarkers = getHubs(stateOfMap.region);
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [bestWaypoint, setBestWaypoint] = useState(null);
+  
+    const handleGenerateWay = () => {
+      console.log("Generating Waypoint")
+      setIsLoading(true);
+      // Call the API to get the best waypoint
+      // Once the response is received, set the bestWaypoint state variable and setIsLoading to false
+      floydWarshall(newMarkers).then((response) => {
+        setBestWaypoint(response);
+        console.log("Best Waypoint is ", bestWaypoint);
+        setIsLoading(false);
+      });
+    };
 
     return (
         <View style={styles.container}>
@@ -89,8 +102,9 @@ const MainMapScreen = () => {
           <ShowMapScreen 
             stateOfMap={stateOfMap} 
             onPressMarkers={() => { setStateOfMap({...stateOfMap,markers: dummyMarkers, googleMapsLoaded: true} )}}
-            onPressPlotter={() => { setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw) }})}}
+            onPressPlotter={() => { handleGenerateWay();setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw) }})}}
              ></ShowMapScreen>
+            {isLoading && console.log("Loading")}
           </View>
         </ErrorBoundary>
         </View>
