@@ -46,9 +46,9 @@ async def build_graph(data, source, destination):
     for index, each_node in enumerate(data):
         for inner_index, each_inner_node in enumerate(data):
             if index == inner_index:
-                graph[index][inner_index] = {"value": 0, "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title'], "latlng": each_node['latlng']}
+                graph[index][inner_index] = {"from_id": each_node["id"], "to_id": each_inner_node["id"], "value": 0, "from": each_node['title'], "to": each_inner_node['title'], "via": each_inner_node['title'], "latlng": each_node['latlng']}
             else:
-                graph[index][inner_index] = {"value": await get_distance(each_node, each_inner_node, source, destination), "from": each_node['title'], "to": each_inner_node['title'], "via": "", "latlng": each_node['latlng']}
+                graph[index][inner_index] = {"from_id": each_node["id"], "to_id": each_inner_node["id"], "value": await get_distance(each_node, each_inner_node, source, destination), "from": each_node['title'], "to": each_inner_node['title'], "via": "", "latlng": each_node['latlng']}
     return graph
 
 async def floyd_warshall(data, source, destination):
@@ -83,7 +83,7 @@ async def best_node(data):
                 #     each_inner_node["via"] = random.choice(sources)
                 #     print(f"Randomly selected {each_inner_node['via']} as via")
                 #     sources.remove(each_inner_node["via"])
-                    return each_inner_node
+                    return {"node": each_inner_node, "fwmatrix": graph}
             # else:
             #     sources.append(each_inner_node["from"])
     return "No Path found"

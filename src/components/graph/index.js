@@ -94,89 +94,72 @@ const GraphScreen = () => {
     },
   };
 
+  const fwmatrix = JSON.parse(localStorage.getItem("fwmatrix"));
+
+  const edges = [
+    { from: 1, to: 99, label: fwmatrix[0][5]["value"].toString() },
+    { from: 1, to: 100, label: fwmatrix[0][6]["value"].toString() },
+    { from: 2, to: 99, label: fwmatrix[1][5]["value"].toString() },
+    { from: 2, to: 100, label: fwmatrix[1][6]["value"].toString() },
+    { from: 3, to: 99, label: fwmatrix[2][5]["value"].toString() },
+    { from: 3, to: 100, label: fwmatrix[2][6]["value"].toString() },
+    { from: 4, to: 99, label: fwmatrix[3][5]["value"].toString() },
+    { from: 4, to: 100, label: fwmatrix[3][6]["value"].toString() },
+    { from: 5, to: 99, label: fwmatrix[4][5]["value"].toString() },
+    { from: 5, to: 100, label: fwmatrix[4][6]["value"].toString() },
+    { from: 101, to: 99, label: fwmatrix[4][6]["value"].toString(), color: "green" },
+    { from: 101, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "green" },
+    { from: 99, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "red" },
+  ]
+
+  // const edges = [
+  //   { from: 1, to: 99, label: "" },
+  //   { from: 1, to: 100, label: "" },
+  //   { from: 2, to: 99, label: "" },
+  //   { from: 2, to: 100, label: "" },
+  //   { from: 3, to: 99, label: "" },
+  //   { from: 3, to: 100, label: "" },
+  //   { from: 4, to: 99, label: "" },
+  //   { from: 4, to: 100, label: "" },
+  //   { from: 5, to: 99, label: "" },
+  //   { from: 5, to: 100, label: "" },
+  //   { from: 101, to: 99, label: "", color: "green" },
+  //   { from: 101, to: 100, label: "", color: "green" },
+  //   { from: 99, to: 100, label: "", color: "red" },
+  // ]
+
+  const prenodes = JSON.parse(localStorage.getItem("nodes")).map((node) => {
+    console.log("Node is ", { ...node, label: node.title + " " + node.id })
+    if (node.title === "Source" || node.title === "Destination") {  
+      return { ...node, label: node.title };
+    } else {
+    return { ...node, label: node.title + " " + node.id };
+    }
+  });
+  const bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
+
+  const nodes = prenodes.map((node) => {
+    if (node.id === 99 || node.id === 100 || node.id === 101) {
+      return { ...node, group: "green" };
+    } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
+      return { ...node, group: "green", id: 101, label: node.title };
+    } else {
+      return node;
+    }
+  });
+
+
+  localStorage.setItem("edges", JSON.stringify(edges))
+  localStorage.setItem("nodes", JSON.stringify(nodes))
+
+  console.log("Nodes are", JSON.parse(localStorage.getItem("nodes")))
+  console.log("Edges are", JSON.parse(localStorage.getItem("edges")))
+
+
   const graph = {
-    edges: [
-      { from: 1, to: 6, label: "" },
-      { from: 1, to: 7, label: "" },
-      { from: 2, to: 6, label: "" },
-      { from: 2, to: 7, label: "" },
-      { from: 3, to: 6, label: "" },
-      { from: 3, to: 7, label: "" },
-      { from: 4, to: 6, label: "" },
-      { from: 4, to: 7, label: "" },
-      { from: 5, to: 6, label: "First Take This", color: "green" },
-      { from: 5, to: 7, label: "Then Take This", color: "green" },
-      { from: 6, to: 7, label: "TRAFFIC", color: "red" },
-    ],
-    nodes: [
-      {
-        description: "department_store",
-        latlng: {
-          latitude: 33.8624839,
-          longitude: -117.9221267,
-        },
-        label: "Costco Wholesale",
-        id: 1,
-      },
-      {
-        description: "local_government_office",
-        latlng: {
-          latitude: 33.8811773,
-          longitude: -117.9264855,
-        },
-        label: "North Justice Center",
-        id: 2,
-      },
-      {
-        description: "restaurant",
-        latlng: {
-          latitude: 33.8690644,
-          longitude: -117.9238634,
-        },
-        label: "The Old Spaghetti Factory",
-        id: 3,
-      },
-      {
-        description: "local_government_office",
-        latlng: {
-          latitude: 33.8819285,
-          longitude: -117.9264468,
-        },
-        label: "Orange County Victim-Witness",
-        id: 4,
-      },
-      {
-        description: "restaurant",
-        latlng: {
-          latitude: 33.8708538,
-          longitude: -117.9245297,
-        },
-        label: "Matador Cantina",
-        group: "green",
-        id: 5,
-      },
-      {
-        description: "restaurant",
-        latlng: {
-          latitude: 33.8708538,
-          longitude: -117.9245297,
-        },
-        label: "Source",
-        group: "green",
-        id: 6,
-      },
-      {
-        description: "restaurant",
-        latlng: {
-          latitude: 33.8708538,
-          longitude: -117.9245297,
-        },
-        label: "Destination",
-        group: "green",
-        id: 7,
-      },
-    ],
-  };
+    edges: edges,
+    nodes: nodes,
+  }
 
 const showToast = (message) => {
   Toast.show({
@@ -265,7 +248,7 @@ const showToast = (message) => {
           <Graph
             graphOptions={options}
             graphNodes={{
-              edges: [{ from: 6, to: 7, label: "", color: "green" }],
+              edges: [{ from: 99, to: 100, label: "", color: "green" }],
               nodes: [
                 { ...graph.nodes[graph.nodes.length - 2] },
                 { ...graph.nodes[graph.nodes.length - 1] },
@@ -277,7 +260,7 @@ const showToast = (message) => {
           <Graph
             graphOptions={options}
             graphNodes={{
-              edges: [{ from: 6, to: 7, label: "TRAFFIC", color: "red" }],
+              edges: [{ from: 99, to: 100, label: "TRAFFIC", color: "red" }],
               nodes: [
                 { ...graph.nodes[graph.nodes.length - 2] },
                 { ...graph.nodes[graph.nodes.length - 1] },
@@ -290,7 +273,7 @@ const showToast = (message) => {
             graphOptions={options}
             graphNodes={{
               ...graph,
-              edges: [{ from: 6, to: 7, label: "TRAFFIC", color: "red" }],
+              edges: [{ from: 99, to: 100, label: "TRAFFIC", color: "red" }],
             }}
           ></Graph>
         )}
@@ -300,9 +283,9 @@ const showToast = (message) => {
             graphNodes={{
               ...graph,
               edges: [
-                { from: 5, to: 6, label: "First Take This", color: "green" },
-                { from: 5, to: 7, label: "Then Take This", color: "green" },
-                { from: 6, to: 7, label: "TRAFFIC", color: "red" },
+                { from: 101, to: 99, label: "First Take This", color: "green" },
+                { from: 101, to: 100, label: "Then Take This", color: "green" },
+                { from: 99, to: 100, label: "TRAFFIC", color: "red" },
               ],
             }}
           ></Graph>

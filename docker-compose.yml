@@ -1,14 +1,14 @@
 version: '3.9'
 services:
-  frontend:
-    image: node:20
-    ports:
-      - 8001:8001
-      - 19006:19006
-    volumes:
-      - ./:/app
-    working_dir: /app
-    command: sh -c "npm i && npm start"
+  # frontend:
+  #   image: node:20
+  #   ports:
+  #     - 8001:8001
+  #     - 19006:19006
+  #   volumes:
+  #     - ./:/app
+  #   working_dir: /app
+  #   command: sh -c "npm i && npm start"
   backend:
     image: python:3.11
     ports:
