@@ -19,7 +19,8 @@ import Colors from "../../style/colors";
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
-if (Platform.OS === "android") {
+if (Platform.OS === "android" ||Platform.OS === "ios" ) 
+  {
   MapViewMob = require("react-native-maps").default;
   MarkerMob = require("react-native-maps").Marker;
   MapViewDirectionsMob = require("react-native-maps-directions").default;
@@ -208,7 +209,7 @@ export default class MapScreen extends Component {
                     </View>
               </View>
             </View>
-          ) : Platform.OS === "android" ? (
+          ) : Platform.OS === "android" || Platform.OS==='ios' ? (
             <View style={styles.container}>
               <MapViewMob
                 style={styles.map}

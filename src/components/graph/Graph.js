@@ -13,7 +13,7 @@ if (Platform.OS === "web") {
   GraphWeb = require("react-vis-network-graph").default;
 }
 
-if (Platform.OS === "android") {
+if (Platform.OS === "android" ||Platform.OS === "ios" ) {
   GraphMob = require("react-native-vis-network").default;
 }
 
@@ -28,7 +28,7 @@ const Graph = ({graphOptions,graphNodes}) => {
               options={graphOptions}
             />
           </ErrorBoundary>
-      ) : Platform.OS === "android" ? (
+      ) : Platform.OS === "android" || Platform.OS==='ios' ? (
         <View style={styles.container}>
           <GraphMob
             data={graphNodes}
