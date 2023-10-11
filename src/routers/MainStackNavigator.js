@@ -8,16 +8,16 @@ const Stack = createStackNavigator();
 export const MainStackNavigator = ({}) => {
   return (
     <Stack.Navigator
-    initialRouteName='Main'
+    initialRouteName='Civic Guardian'
     headerMode='none'
     mode='card'
   >
     <Stack.Screen
-      name='Main'
+      name='Civic Guardian'
       component={MainScreen}
     />
     <Stack.Screen
-      name='Tab'
+      name='Map'
       component={TabNavigator}
     />
   </Stack.Navigator>

@@ -9,7 +9,7 @@ const MainScreen = ({ navigation }) => {
   const [isModalVisible,setIsModalVisible]=useState(false)
 
   const goToTabNavigator = () => {
-      navigation.navigate('Tab');
+      navigation.navigate('Map');
   };
 
   const  toggleModal = () => {
@@ -41,25 +41,12 @@ const MainScreen = ({ navigation }) => {
       </View>
       {isModalVisible && <Manual isVisible={isModalVisible} onClosePress={()=>closeModal()}/>}
 
-      <View
-        style={{ flex: 1, paddingHorizontal: 140, justifyContent: "center" }}
-      >
-        <Text
-          style={{ fontSize: 30, fontWeight: "bold", color: Colors.orange }}
-        >
-          Civic-Guardian
-        </Text>
+      <View style={{ flex: 1, alignItems: "center", justifyContent:'center' }}>
         <TouchableOpacity onPress={goToTabNavigator}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              color: Colors.orange,
-              textDecorationLine: "underline",
-            }}
-          >
-            Get-started
-          </Text>
+         
+           <Text style={{ fontSize: 160, fontWeight: "bold", color: Colors.orange, marginBottom:'7%' }}>
+          Civic Guardian...
+        </Text>
         </TouchableOpacity>
       </View>
     </>

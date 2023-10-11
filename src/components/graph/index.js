@@ -6,9 +6,8 @@ import {
   View,
 } from "react-native";
 import Colors from "../../style/colors";
-import { MaterialCommunityIcons,FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Manual from "./manual"
 import ErrorBoundary from "../errorBoundry";
 import Graph from "./Graph";
 import Toast from 'react-native-toast-message';
@@ -225,6 +224,7 @@ const showToast = (message) => {
     <View style={styles.container}>
       <ErrorBoundary>
       <ToastProvider/>
+      <View style={{flexDirection:'row', justifyContent:'space-between'}}>
         {!simulation && (
           <TouchableOpacity
             style={styles.button}
@@ -232,7 +232,7 @@ const showToast = (message) => {
               onSimulation();
             }}
           >
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row"}}>
               <MaterialCommunityIcons
                 name="graphql"
                 size={24}
@@ -243,6 +243,7 @@ const showToast = (message) => {
             </View>
           </TouchableOpacity>
         )}
+        </View>
 
         {step1 && (
           <Graph
@@ -293,6 +294,8 @@ const showToast = (message) => {
         {step5 && (
           <Graph graphOptions={options} graphNodes={graph}></Graph>
         )}
+      <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+
         {simulation && step5 && (
           <TouchableOpacity
             style={styles.button}
@@ -311,6 +314,7 @@ const showToast = (message) => {
             </View>
           </TouchableOpacity>
         )}
+        </View>
       </ErrorBoundary>
     </View>
   );
@@ -327,7 +331,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems:'center',
     height: 35,
-    width: "20%",
+  
   },
   buttonText: {
     color: Colors.white,

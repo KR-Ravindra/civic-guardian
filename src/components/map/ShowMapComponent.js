@@ -14,7 +14,8 @@ import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
 
-import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import Colors from "../../style/colors";
 
 import floydWarshallNode from "../../apis/FloydWarshallNode";
@@ -228,7 +229,7 @@ export default class MapScreen extends Component {
                       latitude: coord[0],
                       longitude: coord[1],
                     }))}
-                    strokeWidth={14}
+                    strokeWidth={8}
                     strokeColor={showIcon ? "red" : "royalblue"}
                     tappable={true}
                     onClick={() => {
@@ -239,7 +240,21 @@ export default class MapScreen extends Component {
               </MapView>
 
               <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
-                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                  <TouchableOpacity
+            style={styles.button}
+            onPress={this.props.onPressPlotter}
+          >
+          <View style={{flexDirection:'row'}}>
+          <MaterialCommunityIcons
+                name="map-marker-path"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Generate Way</Text>
+
+          </View>
+          </TouchableOpacity>
                     <View style={styles.rgnView}>
                       <Text style={styles.rgnText}>Region:</Text>
                       <Text style={styles.rgnText}>{region.latitude}</Text>
@@ -319,6 +334,11 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+    borderColor:Colors.white,
+    borderWidth:8,
+    borderTopWidth:4,
+    borderBottomWidth:4
+
   },
   markerContainer: {
     width: 40,
@@ -336,5 +356,19 @@ const styles = StyleSheet.create({
     color:'#666666',
   },
   rgnView:{ flexDirection: "row",alignItems: "flex-end"},
+  button: {
+    backgroundColor: Colors.orange,
+    padding: 8,
+    margin: 5,
+    borderRadius: 5,
+    alignItems:'center',
+    height: 35,
+    // width: "15%",
+  },
+  buttonText: {
+    color: Colors.white,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
  
 });
