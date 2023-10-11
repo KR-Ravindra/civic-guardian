@@ -2,10 +2,6 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { TabNavigator } from './TabNavigator';
 import MainScreen from '../components/mainScreen';
-import SplitScreen from '../components/splitScreen';
-import NewSplitScreen from '../components/newSplitScreen'
-import MainMapScreen from '../components/map/index';
-import MapScreen from  '../components/map/ShowMapComponent';
 
 const Stack = createStackNavigator();
 
@@ -24,22 +20,5 @@ export const MainStackNavigator = ({}) => {
       name='Tab'
       component={TabNavigator}
     />
-     <Stack.Screen
-      name='SplitScreen'
-      component={SplitScreen}
-    />
-     <Stack.Screen
-      name='NewSplitScreen'
-      component={NewSplitScreen}
-    />
-    <Stack.Screen
-      name='MapScreen'
-      component={MapScreen}
-    />
-     <Stack.Screen
-      name='MainMapScreen'
-      component={MainMapScreen}
-    />
-
   </Stack.Navigator>
   )}

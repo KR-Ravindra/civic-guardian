@@ -9,12 +9,7 @@ const MainScreen = ({ navigation }) => {
   const [isModalVisible,setIsModalVisible]=useState(false)
 
   const goToTabNavigator = () => {
-    if (Platform.OS === "web") {
-        navigation.navigate("SplitScreen");
-    }
-    if (Platform.OS === "android" ||Platform.OS === "ios" ) {
-        navigation.navigate('Tab');
-      }
+      navigation.navigate('Tab');
   };
 
   const  toggleModal = () => {

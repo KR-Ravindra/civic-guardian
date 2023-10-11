@@ -240,8 +240,6 @@ export default class MapScreen extends Component {
 
               <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
                   <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
-                  <Button title="Simulate"  color={Colors.orange}onPress={this.goNavigate} />
-
                     <View style={styles.rgnView}>
                       <Text style={styles.rgnText}>Region:</Text>
                       <Text style={styles.rgnText}>{region.latitude}</Text>

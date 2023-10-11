@@ -10,11 +10,9 @@ import GraphScreen from '../components/graph'
 
 
 const TabBar = ({ state, navigation }) => {
-
     const [visible, setVisible] = useState(true);
     
     return (
-  
       <View style={{ 
         flexDirection: 'row', 
         backgroundColor: '#000', 
@@ -31,7 +29,6 @@ const TabBar = ({ state, navigation }) => {
                       navigation.navigate(route.name);
                   }
               };
-  
                   return (
                       <TouchableOpacity
                           onPress={onPress}
