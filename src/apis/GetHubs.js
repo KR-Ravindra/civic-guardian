@@ -37,6 +37,7 @@ function getHubs(current_location)  {
           hub.push(JSON.parse(localStorage.getItem('origin')));
           hub.push(JSON.parse(localStorage.getItem('destination')));
           localStorage.setItem('nodes', JSON.stringify(hub));
+          localStorage.setItem('nodesForGraph', JSON.stringify(hub));
           localStorage.setItem('hub', JSON.stringify(hub));
         }
         

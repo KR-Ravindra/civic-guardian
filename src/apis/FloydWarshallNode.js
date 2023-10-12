@@ -24,6 +24,9 @@ async function floydWarshallNode(nodes) {
         const data = await response.json();
         if (Platform.OS === "web") {
         localStorage.setItem("fwmatrix", JSON.stringify(data["fwmatrix"]))
+        if (localStorage.getItem("fwmatrixForGraph") === null) {
+        localStorage.setItem("fwmatrixForGraph", JSON.stringify(data["fwmatrix"]))
+        }
         } else {
             AsyncStorage.setItem("fwmatrix", JSON.stringify(data["fwmatrix"]));
         }

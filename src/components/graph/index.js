@@ -100,8 +100,8 @@ const GraphScreen = () => {
   let fwmatrix;
 
   if (Platform.OS === "web") {
-    fwmatrix = JSON.parse(localStorage.getItem("fwmatrix"));
-    console.log("fwmatrix on web:", fwmatrix);
+    fwmatrix = JSON.parse(localStorage.getItem("fwmatrixForGraph"));
+    console.log("fwmatrix at graph on web:", fwmatrix);
   } else if (Platform.OS === "android" || Platform.OS === "ios") {
     const mobFWMatrix = AsyncStorage.getItem("fwmatrix")
       .then((value) => {
@@ -151,7 +151,7 @@ const GraphScreen = () => {
 
 let prenodes
   if (Platform.OS === "web") {
-     prenodes = JSON.parse(localStorage.getItem("nodes")).map((node) => {
+     prenodes = JSON.parse(localStorage.getItem("nodesForGraph")).map((node) => {
     console.log("Node is ", { ...node, label: node.title + " " + node.id })
     if (node.title === "Source" || node.title === "Destination") {  
       return { ...node, label: node.title };
@@ -256,7 +256,7 @@ let prenodes
 
   if (Platform.OS === "web") {
     localStorage.setItem("edges", JSON.stringify(edges))
-    localStorage.setItem("nodes", JSON.stringify(nodes))
+    localStorage.setItem("nodesForGraph", JSON.stringify(nodes))
 
 }
 
