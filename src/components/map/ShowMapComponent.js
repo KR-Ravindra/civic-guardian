@@ -6,7 +6,7 @@ import {
   Platform,
   TouchableOpacity,
   Image,
-  Button
+  Linking
 } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
@@ -14,11 +14,14 @@ import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
 
-import { FontAwesome5 } from "@expo/vector-icons";
+import { MaterialCommunityIcons,FontAwesome } from "@expo/vector-icons";
+
 import Colors from "../../style/colors";
 
 import floydWarshallNode from "../../apis/FloydWarshallNode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; // Replace with your API key
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -59,6 +62,7 @@ export default class MapScreen extends Component {
     this.state = {
       ...this.props.stateOfMap,
       showIcon: false,
+      mapPlotted: false,
       waypoint: {}, // Add a state variable to control icon visibility
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
@@ -79,14 +83,23 @@ export default class MapScreen extends Component {
 
       if (Platform.OS === "web") {
         try {
-          localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
-          console.log("Component Updated Successfully")
+          // localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          if (Platform.OS === "web") {
+            localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          }
+          
+          if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+            AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          }
+        
           const newcoords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
             this.props.stateOfMap.plot.waypoint,
             this.props.stateOfMap.plot.destination
           );
           this.setState({ coords: newcoords });
+          this.setState({ mapPlotted: true })
         } catch (error) {
           console.error("Error fetching COORDS", error);
         }
@@ -132,13 +145,21 @@ export default class MapScreen extends Component {
     console.log("Map panned or dragged");
   };
 
-  onPolylineClicked = () => {
+  // onPolylineClicked = () => {
+    onPolylineClicked = async () => {
     this.setState(() => ({ showIcon: true }));
-    const hub = JSON.parse(localStorage.getItem('hub'));
-    console.log("Hub array from local storage:", hub);
-    console.log("Waypoint:", this.props.stateOfMap.plot.waypoint.latitude);
+    // const hub = JSON.parse(localStorage.getItem('hub'));
+    let hub
+    if (Platform.OS === "web") {
+       hub = JSON.parse(localStorage.getItem('hub'));
+    }
+    
+    if (Platform.OS === "android" || Platform.OS === "ios") {
+      const hubString = await AsyncStorage.getItem('hub');
+      hub = JSON.parse(hubString);
+    }
+
     const hasWaypoint = hub.some((object) => {
-      console.log(object.latlng.latitude)
       return object.latlng.latitude == this.props.stateOfMap.plot.waypoint.latitude;
     });
     const filteredHub = hub.filter((object) => {
@@ -148,11 +169,28 @@ export default class MapScreen extends Component {
       return true;
     });
     console.log("Filtered hub array:", filteredHub);
-    localStorage.setItem('hub', JSON.stringify(filteredHub));
+    // localStorage.setItem('hub', JSON.stringify(filteredHub));
+    if (Platform.OS === "web") {
+      localStorage.setItem('hub', JSON.stringify(filteredHub));
+    }
+    
+    if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+      AsyncStorage.setItem('hub', JSON.stringify(filteredHub));
+
+    }
+
     console.log("Hub array has waypoint:", hasWaypoint);
     floydWarshallNode(filteredHub).then(async(response) => {
       this.props.stateOfMap.plot.waypoint = response;
-      localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      // localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      if (Platform.OS === "web") {
+        localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      }
+      
+      if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+        AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      }
+
       console.log("Output from floydWarshallNode:", response);
       const newcoords = await fetchRouteData(
         this.props.stateOfMap.plot.origin,
@@ -162,11 +200,14 @@ export default class MapScreen extends Component {
       this.setState({ coords: newcoords });
       this.setState({ showIcon: false });
     }).catch((error) => {
-      console.log("Error from API is ", error);
+      console.log("Error from API to get coords is ", error);
       alert("No More Waypoints left! Please consider the last one");
     });
 
+
   };
+
+
 
   render() {
     const {
@@ -177,15 +218,19 @@ export default class MapScreen extends Component {
       markers,
       googleMapsLoaded,
       plot,
-      showIcon,
+      showIcon
     } = this.state;
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
     return (
+
       <View style={styles.container}>
-        <ErrorBoundary>
+
           {googleMapsLoaded && Platform.OS === "web" ? (
+
             <View style={styles.container}>
+      <ErrorBoundary> 
+
               <MapView
                 style={styles.map}
                 initialRegion={this.state.region}
@@ -228,7 +273,7 @@ export default class MapScreen extends Component {
                       latitude: coord[0],
                       longitude: coord[1],
                     }))}
-                    strokeWidth={14}
+                    strokeWidth={8}
                     strokeColor={showIcon ? "red" : "royalblue"}
                     tappable={true}
                     onClick={() => {
@@ -239,66 +284,112 @@ export default class MapScreen extends Component {
               </MapView>
 
               <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
-                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
-                  <Button title="Simulate"  color={Colors.orange}onPress={this.goNavigate} />
+                  <TouchableOpacity
+            style={styles.button}
+            onPress={this.props.onPressPlotter}
+          >
+          <View style={{flexDirection:'row'}}>
+          <MaterialCommunityIcons
+                name="map-marker-path"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Generate Way</Text>
 
+          </View>
+          </TouchableOpacity>
                     <View style={styles.rgnView}>
                       <Text style={styles.rgnText}>Region:</Text>
                       <Text style={styles.rgnText}>{region.latitude}</Text>
                       <Text style={styles.rgnText}>{region.longitude}</Text>
                     </View>
-              </View>
-            </View>
-          ) : Platform.OS === "android" || Platform.OS==='ios' ? (
-            <View style={styles.container}>
-              <MapViewMob
-                style={styles.map}
-                initialRegion={this.state.region}
-                region={this.state.region}
-                onRegionChange={(new_region) => {
-                  this.debouncedOnRegionChange(new_region);
-                }}
-                mapType="terrain"
-                customMapStyle={MapStyle}
-              >
-                <MarkerMob coordinate={origin} title="Origin">
-                  <View style={styles.markerContainer}>
-                    <Image source={custom_pin} style={styles.markerImage} />
-                  </View>
-                </MarkerMob>
-                <MarkerMob coordinate={destination} title="Destination">
-                  <View style={styles.markerContainer}>
-                    <Image source={custom_pin} style={styles.markerImage} />
-                  </View>
-                </MarkerMob>
+            <TouchableOpacity
+            style={styles.button}
+            onPress={() => {console.log("Pressed"); Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=${plot.origin.latitude},${plot.origin.longitude}&destination=${plot.destination.latitude},${plot.destination.longitude}&waypoints=${plot.waypoint.latitude},${plot.waypoint.longitude}`)}}
+          >
+          <View style={{flexDirection:'row'}}>
+          <FontAwesome
+                name="location-arrow"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Google Maps</Text>
 
-                {console.log("Markers are ", markers) ||
-                  markers.map((marker, index) => (
-                    <MarkerMob
-                      key={index}
-                      coordinate={marker.latlng}
-                      title={marker.title}
-                      description={marker.description}
-                    />
-                  ))}
-                {plot.draw && (
+          </View>
+          </TouchableOpacity>
+              </View>
+       </ErrorBoundary> 
+            </View>
+
+          ) : Platform.OS === "android" || Platform.OS==='ios' ? (
+                <View style={styles.container}>
+                  <MapViewMob
+                    style={styles.map}
+                    initialRegion={this.state.region}
+                    region={this.state.region}
+                    onRegionChange={(new_region) => {
+                      this.debouncedOnRegionChange(new_region);
+                    }}
+                    mapType="terrain"
+                    customMapStyle={MapStyle}
+                   >
+                    <MarkerMob coordinate={origin} title="Origin">
+                      <View style={styles.markerContainer}>
+                        <Image source={custom_pin} style={styles.markerImage} />
+                      </View>
+                    </MarkerMob>
+
+                    <MarkerMob coordinate={destination} title="Destination">
+                      <View style={styles.markerContainer}>
+                        <Image source={custom_pin} style={styles.markerImage} />
+                      </View>
+                    </MarkerMob>
+
+                    { markers && markers.map((marker, index) => (
+                      <MarkerMob
+                        key={index}
+                        coordinate={marker.latlng}
+                        title={marker.title}
+                        description={marker.description}
+                      />
+                    ))}
+
+                { plot.draw && (
                   <MapViewDirectionsMob
-                    origin={origin}
-                    waypoints={[
-                      {
-                        latitude: plot.waypoint.latitude,
-                        longitude: plot.waypoint.longitude,
-                      },
-                    ]}
-                    destination={destination}
-                    apikey={apiKey}
-                    strokeWidth={14}
-                    strokeColor="hotpink"
+                  origin={origin}
+                  destination={destination}
+                  waypoint={plot.waypoint}
+                  strokeColor={showIcon ? "red" : "royalblue"}
+                  tappable={true}
+                  onPress={() => {
+                    this.onPolylineClicked();
+                  }}
+                  apikey={apiKey}
+                  strokeWidth={14}
+              
                   />
                 )}
+
               </MapViewMob>
+              <TouchableOpacity
+            style={styles.button}
+            onPress={this.props.onPressPlotter}
+          >
+          <View style={{flexDirection:'row'}}>
+          <MaterialCommunityIcons
+                name="map-marker-path"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Generate Way</Text>
+
+          </View>
+          </TouchableOpacity>
               <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
-                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                  
                     <View style={styles.rgnView}>
                       <Text style={styles.rgnText}>Region:</Text>
                       <Text style={styles.rgnText}>{region.latitude}</Text>
@@ -309,7 +400,6 @@ export default class MapScreen extends Component {
           ) : (
             <Text>LOADING....</Text>
           )}
-        </ErrorBoundary>
       </View>
     );
   }
@@ -321,6 +411,11 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+    borderColor:Colors.white,
+    borderWidth:8,
+    borderTopWidth:4,
+    borderBottomWidth:4
+
   },
   markerContainer: {
     width: 40,
@@ -338,5 +433,19 @@ const styles = StyleSheet.create({
     color:'#666666',
   },
   rgnView:{ flexDirection: "row",alignItems: "flex-end"},
+  button: {
+    backgroundColor: Colors.orange,
+    padding: 8,
+    margin: 5,
+    borderRadius: 5,
+    alignItems:'center',
+    height: 35,
+    // width: "15%",
+  },
+  buttonText: {
+    color: Colors.white,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
  
 });

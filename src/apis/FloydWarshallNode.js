@@ -1,3 +1,7 @@
+import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
 async function floydWarshallNode(nodes) {
     // makes a fetch call to localhost:8000/api/floyd_warshall
     const nodesList = nodes.map(node => ({ id: node.key, ...node }));
@@ -6,7 +10,7 @@ async function floydWarshallNode(nodes) {
         data: nodesList
     }
 
-    let url = "http://localhost:8000/getBestWayPoint"
+    let url = "http://10.67.120.196:8000/getBestWayPoint"
 
     const response = await fetch(url, {
         method: "POST",
@@ -18,7 +22,14 @@ async function floydWarshallNode(nodes) {
 
     if (response.ok) {
         const data = await response.json();
+        if (Platform.OS === "web") {
         localStorage.setItem("fwmatrix", JSON.stringify(data["fwmatrix"]))
+        if (localStorage.getItem("fwmatrixForGraph") === null) {
+        localStorage.setItem("fwmatrixForGraph", JSON.stringify(data["fwmatrix"]))
+        }
+        } else {
+            AsyncStorage.setItem("fwmatrix", JSON.stringify(data["fwmatrix"]));
+        }
         const waypoint = getBestWaypoint(data);
         return waypoint;
     } else {

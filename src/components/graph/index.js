@@ -4,15 +4,15 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform
 } from "react-native";
 import Colors from "../../style/colors";
-import { MaterialCommunityIcons,FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Manual from "./manual"
 import ErrorBoundary from "../errorBoundry";
 import Graph from "./Graph";
-import Toast from 'react-native-toast-message';
-import ToastProvider from 'react-native-toast-message'
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomToast from './CustomToast';
 
 
 
@@ -23,6 +23,8 @@ const GraphScreen = () => {
   const [step4, setStep4] = useState(false);
   const [step5, setStep5] = useState(false);
   const [simulation, setSimulation] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const options = {
     interaction: {
@@ -94,9 +96,26 @@ const GraphScreen = () => {
     },
   };
 
-  const fwmatrix = JSON.parse(localStorage.getItem("fwmatrix"));
+  
+  let fwmatrix;
 
-  const edges = [
+  if (Platform.OS === "web") {
+    fwmatrix = JSON.parse(localStorage.getItem("fwmatrixForGraph"));
+    console.log("fwmatrix at graph on web:", fwmatrix);
+  } else if (Platform.OS === "android" || Platform.OS === "ios") {
+    const mobFWMatrix = AsyncStorage.getItem("fwmatrix")
+      .then((value) => {
+        console.log("FWMATRIX ON MOBILE IS", value);
+        return JSON.parse(value);
+      })
+      .catch((error) => {
+        console.log("Error in getting FWMATRIX ON MOBILE", error);
+      });
+    fwmatrix = mobFWMatrix;
+  }
+  let edges
+  if (Platform.OS === "web") {
+  edges = [
     { from: 1, to: 99, label: fwmatrix[0][5]["value"].toString() },
     { from: 1, to: 100, label: fwmatrix[0][6]["value"].toString() },
     { from: 2, to: 99, label: fwmatrix[1][5]["value"].toString() },
@@ -111,24 +130,28 @@ const GraphScreen = () => {
     { from: 101, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "green" },
     { from: 99, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "red" },
   ]
+} else {
+  edges = [
+    { from: 1, to: 99, label: "" },
+    { from: 1, to: 100, label: "" },
+    { from: 2, to: 99, label: "" },
+    { from: 2, to: 100, label: "" },
+    { from: 3, to: 99, label: "" },
+    { from: 3, to: 100, label: "" },
+    { from: 4, to: 99, label: "" },
+    { from: 4, to: 100, label: "" },
+    { from: 5, to: 99, label: "" },
+    { from: 5, to: 100, label: "" },
+    { from: 101, to: 99, label: "", color: "green" },
+    { from: 101, to: 100, label: "", color: "green" },
+    { from: 99, to: 100, label: "", color: "red" },
+  ]
+  console.log("Edges are ", edges)
+}
 
-  // const edges = [
-  //   { from: 1, to: 99, label: "" },
-  //   { from: 1, to: 100, label: "" },
-  //   { from: 2, to: 99, label: "" },
-  //   { from: 2, to: 100, label: "" },
-  //   { from: 3, to: 99, label: "" },
-  //   { from: 3, to: 100, label: "" },
-  //   { from: 4, to: 99, label: "" },
-  //   { from: 4, to: 100, label: "" },
-  //   { from: 5, to: 99, label: "" },
-  //   { from: 5, to: 100, label: "" },
-  //   { from: 101, to: 99, label: "", color: "green" },
-  //   { from: 101, to: 100, label: "", color: "green" },
-  //   { from: 99, to: 100, label: "", color: "red" },
-  // ]
-
-  const prenodes = JSON.parse(localStorage.getItem("nodes")).map((node) => {
+let prenodes
+  if (Platform.OS === "web") {
+     prenodes = JSON.parse(localStorage.getItem("nodesForGraph")).map((node) => {
     console.log("Node is ", { ...node, label: node.title + " " + node.id })
     if (node.title === "Source" || node.title === "Destination") {  
       return { ...node, label: node.title };
@@ -136,56 +159,137 @@ const GraphScreen = () => {
     return { ...node, label: node.title + " " + node.id };
     }
   });
-  const bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
+  } 
+   let bestWaypoint
+   let nodes
+  if (Platform.OS === "web") {
+      bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
+      nodes = prenodes.map((node) => {
+      if (node.id === 99 || node.id === 100 || node.id === 101) {
+        return { ...node, group: "green" };
+      } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
+        try {
+        return { ...node, group: "green", id: 101, label: node.title };
+        } catch {
+          console.log("Caught")
+        }
+      } else {
+        return node;
+      }
+    });
+  } else {
+    nodes = [
+      {
+        description: "department_store",
+        latlng: {
+          latitude: 33.8624839,
+          longitude: -117.9221267,
+        },
+        label: "Costco Wholesale",
+        id: 1,
+      },
+      {
+        description: "local_government_office",
+        latlng: {
+          latitude: 33.8811773,
+          longitude: -117.9264855,
+        },
+        label: "North Justice Center",
+        id: 2,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8690644,
+          longitude: -117.9238634,
+        },
+        label: "The Old Spaghetti Factory",
+        id: 3,
+      },
+      {
+        description: "local_government_office",
+        latlng: {
+          latitude: 33.8819285,
+          longitude: -117.9264468,
+        },
+        label: "Orange County Victim-Witness",
+        id: 4,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Matador Cantina",
+        group: "green",
+        id: 5,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Matador Cantina",
+        group: "green",
+        id: 101,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Source",
+        group: "green",
+        id: 99,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Destination",
+        group: "green",
+        id: 100,
+      },
+    ]
+  }
 
-  const nodes = prenodes.map((node) => {
-    if (node.id === 99 || node.id === 100 || node.id === 101) {
-      return { ...node, group: "green" };
-    } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
-      return { ...node, group: "green", id: 101, label: node.title };
-    } else {
-      return node;
-    }
-  });
+  if (Platform.OS === "web") {
+    localStorage.setItem("edges", JSON.stringify(edges))
+    localStorage.setItem("nodesForGraph", JSON.stringify(nodes))
 
-
-  localStorage.setItem("edges", JSON.stringify(edges))
-  localStorage.setItem("nodes", JSON.stringify(nodes))
-
-  console.log("Nodes are", JSON.parse(localStorage.getItem("nodes")))
-  console.log("Edges are", JSON.parse(localStorage.getItem("edges")))
-
+}
 
   const graph = {
     edges: edges,
     nodes: nodes,
   }
 
-const showToast = (message) => {
-  Toast.show({
-    type: 'info',
-    position: 'top',
-    text1: message,
-  
-  });
-  
-};
- 
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastVisible(true);
+  };
 
+ 
   const wait = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
-
+  
 
   const onSimulation = () => {
+    showToast("Starting Simulation")
     setSimulation(true);
     setStep1(true);
     wait(2500)
       .then(() => showToast("Oops! Traffic Detected"))
       .then(() => {
-        setStep1(false);
-        setStep2(true);
-      })
+          setStep1(false);
+          setStep2(true);
+        })
       .then(() => wait(2500))
       .then(() =>
         showToast(
@@ -206,11 +310,12 @@ const showToast = (message) => {
       })
       .then(() => wait(2500))
       .then(() => showToast("Generating the complete matrix!", "OK"))
-
       .then(() => {
         setStep4(false);
         setStep5(true);
+        setToastVisible(false)
       });
+
   };
   const onReset = () => {
     setStep1(false);
@@ -224,7 +329,13 @@ const showToast = (message) => {
   return (
     <View style={styles.container}>
       <ErrorBoundary>
-      <ToastProvider/>
+      {toastVisible && (
+        <CustomToast
+          message={toastMessage}
+          onClose={() => setToastVisible(false)}
+        />
+      )}
+      <View style={{flexDirection:'row', justifyContent:'space-between'}}>
         {!simulation && (
           <TouchableOpacity
             style={styles.button}
@@ -232,7 +343,7 @@ const showToast = (message) => {
               onSimulation();
             }}
           >
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row"}}>
               <MaterialCommunityIcons
                 name="graphql"
                 size={24}
@@ -243,6 +354,7 @@ const showToast = (message) => {
             </View>
           </TouchableOpacity>
         )}
+        </View>
 
         {step1 && (
           <Graph
@@ -283,8 +395,8 @@ const showToast = (message) => {
             graphNodes={{
               ...graph,
               edges: [
-                { from: 101, to: 99, label: "First Take This", color: "green" },
-                { from: 101, to: 100, label: "Then Take This", color: "green" },
+                { from: 101, to: 99, label: "Best Way", color: "green" },
+                { from: 101, to: 100, label: "Possible", color: "green" },
                 { from: 99, to: 100, label: "TRAFFIC", color: "red" },
               ],
             }}
@@ -293,6 +405,8 @@ const showToast = (message) => {
         {step5 && (
           <Graph graphOptions={options} graphNodes={graph}></Graph>
         )}
+      <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+
         {simulation && step5 && (
           <TouchableOpacity
             style={styles.button}
@@ -311,6 +425,7 @@ const showToast = (message) => {
             </View>
           </TouchableOpacity>
         )}
+        </View>
       </ErrorBoundary>
     </View>
   );
@@ -327,7 +442,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems:'center',
     height: 35,
-    width: "20%",
+  
   },
   buttonText: {
     color: Colors.white,
