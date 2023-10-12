@@ -10,9 +10,11 @@ const CustomToast = ({ message, onClose }) => {
           <View style={styles.blueBackground}></View>
           <View style={styles.whiteBackground}>
             <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity style={styles.okButton} onPress={onClose}>
-              <Text style={styles.okText}>OK</Text>
-            </TouchableOpacity>
+            <View style={styles.okButtonContainer}>
+              <TouchableOpacity style={styles.okButton} onPress={onClose}>
+                <Text style={styles.okText}>OK</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -29,7 +31,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     padding: 16,
     borderRadius: 8,
-    width: '50%',
+    width: '29%',
     flexDirection: 'row', // Use flexDirection 'row' to align two views horizontally
   },
   blueBackground: {
@@ -40,20 +42,23 @@ const styles = StyleSheet.create({
   },
   whiteBackground: {
     backgroundColor: Colors.white,
-    width: '95%', // Adjust the percentage as needed
+    flex: 1,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
-    padding: 16,
-    justifyContent: 'center',
+    padding: 9,
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   message: {
     color: Colors.black,
     marginBottom: 8,
   },
+  okButtonContainer: {
+    alignSelf: 'flex-end', // Align the button to the end of the container
+  },
   okButton: {
     backgroundColor: Colors.white,
-    padding: 8,
+    padding: 6,
     borderRadius: 5,
   },
   okText: {

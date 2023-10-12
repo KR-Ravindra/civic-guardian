@@ -11,8 +11,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ErrorBoundary from "../errorBoundry";
 import Graph from "./Graph";
-import Toast from 'react-native-toast-message';
-// import ToastProvider from 'react-native-toast-message'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomToast from './CustomToast';
 
@@ -25,6 +23,8 @@ const GraphScreen = () => {
   const [step4, setStep4] = useState(false);
   const [step5, setStep5] = useState(false);
   const [simulation, setSimulation] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const options = {
     interaction: {
@@ -210,33 +210,17 @@ if (Platform.OS === "android" ||Platform.OS === "ios" ) {
     nodes: nodes,
   }
 
-// const showToast = (message) => {
-//   Toast.show({
-//     type: 'info',
-//     position: 'top',
-//     text1: message,
-//     text1Style: { fontSize: 16, textAlign: 'center' },
-//     // render: (props) => (
-//       // <CustomToast {...props} message={message} onOkPress={props.hide} />
-//     // ),
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastVisible(true);
+  };
   
-//   });
   
-// };
-const [toastVisible, setToastVisible] = useState(false);
-const [toastMessage, setToastMessage] = useState('');
-
-const showToast = (message) => {
-  setToastMessage(message);
-  setToastVisible(true);
-};
-
- 
-
   const wait = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
-
+  
 
   const onSimulation = () => {
     setSimulation(true);
@@ -285,7 +269,6 @@ const showToast = (message) => {
   return (
     <View style={styles.container}>
       <ErrorBoundary>
-      {/* <ToastProvider/> */}
       {toastVisible && (
         <CustomToast
           message={toastMessage}
