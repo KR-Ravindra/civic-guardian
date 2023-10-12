@@ -6,7 +6,8 @@ import {
   Platform,
   TouchableOpacity,
   Image,
-  Button
+  Button,
+  Linking
 } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
@@ -62,6 +63,7 @@ export default class MapScreen extends Component {
     this.state = {
       ...this.props.stateOfMap,
       showIcon: false,
+      mapPlotted: false,
       waypoint: {}, // Add a state variable to control icon visibility
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
@@ -98,6 +100,7 @@ export default class MapScreen extends Component {
             this.props.stateOfMap.plot.destination
           );
           this.setState({ coords: newcoords });
+          this.setState({ mapPlotted: true })
         } catch (error) {
           console.error("Error fetching COORDS", error);
         }
@@ -202,7 +205,10 @@ export default class MapScreen extends Component {
       alert("No More Waypoints left! Please consider the last one");
     });
 
+
   };
+
+
 
   render() {
     const {
@@ -213,7 +219,7 @@ export default class MapScreen extends Component {
       markers,
       googleMapsLoaded,
       plot,
-      showIcon,
+      showIcon
     } = this.state;
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
@@ -299,9 +305,23 @@ export default class MapScreen extends Component {
                       <Text style={styles.rgnText}>{region.latitude}</Text>
                       <Text style={styles.rgnText}>{region.longitude}</Text>
                     </View>
+            <TouchableOpacity
+            style={styles.button}
+            onPress={() => {console.log("Pressed"); Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=${plot.origin.latitude},${plot.origin.longitude}&destination=${plot.destination.latitude},${plot.destination.longitude}&waypoints=${plot.waypoint.latitude},${plot.waypoint.longitude}`)}}
+          >
+          <View style={{flexDirection:'row'}}>
+          <MaterialCommunityIcons
+                name="map-marker-path"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Google Maps</Text>
+
+          </View>
+          </TouchableOpacity>
               </View>
        </ErrorBoundary> 
-
             </View>
 
           ) : Platform.OS === "android" || Platform.OS==='ios' ? (
