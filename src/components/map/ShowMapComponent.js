@@ -203,7 +203,7 @@ export default class MapScreen extends Component {
       this.setState({ coords: newcoords });
       this.setState({ showIcon: false });
     }).catch((error) => {
-      console.log("Error from API is ", error);
+      console.log("Error from API to get coords is ", error);
       alert("No More Waypoints left! Please consider the last one");
     });
 
@@ -310,55 +310,51 @@ export default class MapScreen extends Component {
             </View>
 
           ) : Platform.OS === "android" || Platform.OS==='ios' ? (
-            <View style={styles.container}>
-              <MapViewMob
-                style={styles.map}
-                initialRegion={this.state.region}
-                region={this.state.region}
-                onRegionChange={(new_region) => {
-                  this.debouncedOnRegionChange(new_region);
-                }}
-                mapType="terrain"
-                customMapStyle={MapStyle}
-              >
-<MarkerMob coordinate={origin} title="Origin">
-                  <View style={styles.markerContainer}>
-                    <Image source={custom_pin} style={styles.markerImage} />
-                  </View>
-                </MarkerMob>
+                <View style={styles.container}>
+                  <MapViewMob
+                    style={styles.map}
+                    initialRegion={this.state.region}
+                    region={this.state.region}
+                    onRegionChange={(new_region) => {
+                      this.debouncedOnRegionChange(new_region);
+                    }}
+                    mapType="terrain"
+                    customMapStyle={MapStyle}
+                   >
+                    <MarkerMob coordinate={origin} title="Origin">
+                      <View style={styles.markerContainer}>
+                        <Image source={custom_pin} style={styles.markerImage} />
+                      </View>
+                    </MarkerMob>
 
-                <MarkerMob coordinate={destination} title="Destination">
-                  <View style={styles.markerContainer}>
-                    <Image source={custom_pin} style={styles.markerImage} />
-                  </View>
-                </MarkerMob>
+                    <MarkerMob coordinate={destination} title="Destination">
+                      <View style={styles.markerContainer}>
+                        <Image source={custom_pin} style={styles.markerImage} />
+                      </View>
+                    </MarkerMob>
 
-                {markers.map((marker, index) => (
-                  <MarkerMob
-                    key={index}
-                    coordinate={marker.latlng}
-                    title={marker.title}
-                    description={marker.description}
-                  />
-                ))}
+                    { markers && markers.map((marker, index) => (
+                      <MarkerMob
+                        key={index}
+                        coordinate={marker.latlng}
+                        title={marker.title}
+                        description={marker.description}
+                      />
+                    ))}
 
-                {coords && (
+                { plot.draw && (
                   <MapViewDirectionsMob
                   origin={origin}
                   destination={destination}
-                  waypoint={coords.map((coord) => ({
-                      latitude: coord[0],
-                      longitude: coord[1],
-                    }))}
-                  
-                    strokeColor={showIcon ? "red" : "royalblue"}
-                    tappable={true}
-                    onPress={() => {
-                      this.onPolylineClicked();
-                    }}
-                    apikey={apiKey}
-                    strokeWidth={14}
-                
+                  waypoint={plot.waypoint}
+                  strokeColor={showIcon ? "red" : "royalblue"}
+                  tappable={true}
+                  onPress={() => {
+                    this.onPolylineClicked();
+                  }}
+                  apikey={apiKey}
+                  strokeWidth={14}
+              
                   />
                 )}
 
