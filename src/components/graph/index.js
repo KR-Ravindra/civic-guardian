@@ -12,8 +12,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ErrorBoundary from "../errorBoundry";
 import Graph from "./Graph";
 import Toast from 'react-native-toast-message';
-import ToastProvider from 'react-native-toast-message'
+// import ToastProvider from 'react-native-toast-message'
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomToast from './CustomToast';
 
 
 
@@ -209,15 +210,27 @@ if (Platform.OS === "android" ||Platform.OS === "ios" ) {
     nodes: nodes,
   }
 
+// const showToast = (message) => {
+//   Toast.show({
+//     type: 'info',
+//     position: 'top',
+//     text1: message,
+//     text1Style: { fontSize: 16, textAlign: 'center' },
+//     // render: (props) => (
+//       // <CustomToast {...props} message={message} onOkPress={props.hide} />
+//     // ),
+  
+//   });
+  
+// };
+const [toastVisible, setToastVisible] = useState(false);
+const [toastMessage, setToastMessage] = useState('');
+
 const showToast = (message) => {
-  Toast.show({
-    type: 'info',
-    position: 'top',
-    text1: message,
-  
-  });
-  
+  setToastMessage(message);
+  setToastVisible(true);
 };
+
  
 
   const wait = (ms) => {
@@ -272,7 +285,13 @@ const showToast = (message) => {
   return (
     <View style={styles.container}>
       <ErrorBoundary>
-      <ToastProvider/>
+      {/* <ToastProvider/> */}
+      {toastVisible && (
+        <CustomToast
+          message={toastMessage}
+          onClose={() => setToastVisible(false)}
+        />
+      )}
       <View style={{flexDirection:'row', justifyContent:'space-between'}}>
         {!simulation && (
           <TouchableOpacity
