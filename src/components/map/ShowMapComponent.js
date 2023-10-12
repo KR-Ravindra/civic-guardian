@@ -6,7 +6,6 @@ import {
   Platform,
   TouchableOpacity,
   Image,
-  Button,
   Linking
 } from "react-native";
 
@@ -15,7 +14,7 @@ import MapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons,FontAwesome } from "@expo/vector-icons";
 
 import Colors from "../../style/colors";
 
@@ -310,8 +309,8 @@ export default class MapScreen extends Component {
             onPress={() => {console.log("Pressed"); Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=${plot.origin.latitude},${plot.origin.longitude}&destination=${plot.destination.latitude},${plot.destination.longitude}&waypoints=${plot.waypoint.latitude},${plot.waypoint.longitude}`)}}
           >
           <View style={{flexDirection:'row'}}>
-          <MaterialCommunityIcons
-                name="map-marker-path"
+          <FontAwesome
+                name="location-arrow"
                 size={24}
                 color={Colors.white}
                 style={{ marginRight: 10 }}
