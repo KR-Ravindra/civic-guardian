@@ -103,19 +103,19 @@ const GraphScreen = () => {
     fwmatrix = JSON.parse(localStorage.getItem("fwmatrix"));
     console.log("fwmatrix on web:", fwmatrix);
   } else if (Platform.OS === "android" || Platform.OS === "ios") {
-    AsyncStorage.getItem("fwmatrix")
-      .then((fwmatrixString) => {
-        fwmatrix = JSON.parse(fwmatrixString);
-        console.log("fwmatrix on mobile:", fwmatrix);
-  
-        // Now you can use the fwmatrix variable as needed
-  
+    const mobFWMatrix = AsyncStorage.getItem("fwmatrix")
+      .then((value) => {
+        console.log("FWMATRIX ON MOBILE IS", value);
+        return JSON.parse(value);
       })
       .catch((error) => {
-        console.error("Error fetching fwmatrix from AsyncStorage:", error);
+        console.log("Error in getting FWMATRIX ON MOBILE", error);
       });
+    fwmatrix = mobFWMatrix;
   }
-  const edges = [
+  let edges
+  if (Platform.OS === "web") {
+  edges = [
     { from: 1, to: 99, label: fwmatrix[0][5]["value"].toString() },
     { from: 1, to: 100, label: fwmatrix[0][6]["value"].toString() },
     { from: 2, to: 99, label: fwmatrix[1][5]["value"].toString() },
@@ -130,22 +130,24 @@ const GraphScreen = () => {
     { from: 101, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "green" },
     { from: 99, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "red" },
   ]
-
-  // const edges = [
-  //   { from: 1, to: 99, label: "" },
-  //   { from: 1, to: 100, label: "" },
-  //   { from: 2, to: 99, label: "" },
-  //   { from: 2, to: 100, label: "" },
-  //   { from: 3, to: 99, label: "" },
-  //   { from: 3, to: 100, label: "" },
-  //   { from: 4, to: 99, label: "" },
-  //   { from: 4, to: 100, label: "" },
-  //   { from: 5, to: 99, label: "" },
-  //   { from: 5, to: 100, label: "" },
-  //   { from: 101, to: 99, label: "", color: "green" },
-  //   { from: 101, to: 100, label: "", color: "green" },
-  //   { from: 99, to: 100, label: "", color: "red" },
-  // ]
+} else {
+  edges = [
+    { from: 1, to: 99, label: "" },
+    { from: 1, to: 100, label: "" },
+    { from: 2, to: 99, label: "" },
+    { from: 2, to: 100, label: "" },
+    { from: 3, to: 99, label: "" },
+    { from: 3, to: 100, label: "" },
+    { from: 4, to: 99, label: "" },
+    { from: 4, to: 100, label: "" },
+    { from: 5, to: 99, label: "" },
+    { from: 5, to: 100, label: "" },
+    { from: 101, to: 99, label: "", color: "green" },
+    { from: 101, to: 100, label: "", color: "green" },
+    { from: 99, to: 100, label: "", color: "red" },
+  ]
+  console.log("Edges are ", edges)
+}
 
 let prenodes
   if (Platform.OS === "web") {
@@ -157,38 +159,100 @@ let prenodes
     return { ...node, label: node.title + " " + node.id };
     }
   });
-  }
-  
-  if (Platform.OS === "android" ||Platform.OS === "ios" ) {
-   prenodes = JSON.parse(AsyncStorage.getItem("nodes")).map((node) => {
-    console.log("Node is ", { ...node, label: node.title + " " + node.id })
-    if (node.title === "Source" || node.title === "Destination") {  
-      return { ...node, label: node.title };
-    } else {
-    return { ...node, label: node.title + " " + node.id };
-    }
-  });
-  }
+  } 
    let bestWaypoint
+   let nodes
   if (Platform.OS === "web") {
       bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
-
- }
- 
- if (Platform.OS === "android" ||Platform.OS === "ios" ) {
- bestWaypoint = JSON.parse(AsyncStorage.getItem("best_waypoint"));
-
- }
-
-  const nodes = prenodes.map((node) => {
-    if (node.id === 99 || node.id === 100 || node.id === 101) {
-      return { ...node, group: "green" };
-    } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
-      return { ...node, group: "green", id: 101, label: node.title };
-    } else {
-      return node;
-    }
-  });
+      nodes = prenodes.map((node) => {
+      if (node.id === 99 || node.id === 100 || node.id === 101) {
+        return { ...node, group: "green" };
+      } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
+        return { ...node, group: "green", id: 101, label: node.title };
+      } else {
+        return node;
+      }
+    });
+  } else {
+    nodes = [
+      {
+        description: "department_store",
+        latlng: {
+          latitude: 33.8624839,
+          longitude: -117.9221267,
+        },
+        label: "Costco Wholesale",
+        id: 1,
+      },
+      {
+        description: "local_government_office",
+        latlng: {
+          latitude: 33.8811773,
+          longitude: -117.9264855,
+        },
+        label: "North Justice Center",
+        id: 2,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8690644,
+          longitude: -117.9238634,
+        },
+        label: "The Old Spaghetti Factory",
+        id: 3,
+      },
+      {
+        description: "local_government_office",
+        latlng: {
+          latitude: 33.8819285,
+          longitude: -117.9264468,
+        },
+        label: "Orange County Victim-Witness",
+        id: 4,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Matador Cantina",
+        group: "green",
+        id: 5,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Matador Cantina",
+        group: "green",
+        id: 101,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Source",
+        group: "green",
+        id: 99,
+      },
+      {
+        description: "restaurant",
+        latlng: {
+          latitude: 33.8708538,
+          longitude: -117.9245297,
+        },
+        label: "Destination",
+        group: "green",
+        id: 100,
+      },
+    ]
+  }
 
   if (Platform.OS === "web") {
     localStorage.setItem("edges", JSON.stringify(edges))
@@ -196,20 +260,10 @@ let prenodes
 
 }
 
-if (Platform.OS === "android" ||Platform.OS === "ios" ) {
-  AsyncStorage.setItem("edges", JSON.stringify(edges))
-  AsyncStorage.setItem("nodes", JSON.stringify(nodes))
-
-} 
-
-  // console.log("Nodes are", JSON.parse(localStorage.getItem("nodes")))
-  // console.log("Edges are", JSON.parse(localStorage.getItem("edges")))
-
   const graph = {
     edges: edges,
     nodes: nodes,
   }
-
 
   const showToast = (message) => {
     setToastMessage(message);
@@ -337,8 +391,8 @@ if (Platform.OS === "android" ||Platform.OS === "ios" ) {
             graphNodes={{
               ...graph,
               edges: [
-                { from: 101, to: 99, label: "First Take This", color: "green" },
-                { from: 101, to: 100, label: "Then Take This", color: "green" },
+                { from: 101, to: 99, label: "Best Way", color: "green" },
+                { from: 101, to: 100, label: "Possible", color: "green" },
                 { from: 99, to: 100, label: "TRAFFIC", color: "red" },
               ],
             }}

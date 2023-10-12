@@ -17,7 +17,6 @@ const MainMapScreen = ({navigation}) => {
     }
     
     if (Platform.OS === "android" ||Platform.OS === "ios" ) {
-      console.log("This is being sent", AsyncStorage.setItem("origin", JSON.stringify(origin)));
       AsyncStorage.setItem("origin", JSON.stringify(origin));
       AsyncStorage.setItem("destination", JSON.stringify(destination));
     }
@@ -45,9 +44,8 @@ const MainMapScreen = ({navigation}) => {
     const newMarkers = getHubs(stateOfMap.region);
 
     const handleGenerateWay = () => {
-      console.log("New Markers are", newMarkers)
       floydWarshallNode(newMarkers).then((response) => {
-        console.log("Response from API is ", response);
+        console.log("Response from FloydWarshall API is ", response);
         setBestWaypoint(response);
         console.log("Waiting for the response to remove loading screen")
         setStateOfMap({...stateOfMap,markers: newMarkers, googleMapsLoaded: true, plot: {...stateOfMap.plot, draw: (!stateOfMap.plot.draw), waypoint: response }});
