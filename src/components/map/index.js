@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View,Platform } from 'react-native';
 import ErrorBoundary from '../errorBoundry';
 import ShowMapScreen from './ShowMapComponent';
 import getHubs from '../../apis/GetHubs';
 import floydWarshallNode from '../../apis/FloydWarshallNode';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const MainMapScreen = ({navigation}) => {
     const dummyMarkers = [
@@ -60,8 +62,20 @@ const MainMapScreen = ({navigation}) => {
     ];
     const origin = { "id": 99, "label": "Source", "title": "Source","latlng": { "latitude": 33.843663, "longitude": -117.945171 }, "latitude": 33.843663, "longitude": -117.945171 }
     const destination = { "id": 100, "label": "Destination", "title": "Destination","latlng": { "latitude": 33.8252956, "longitude": -117.8307728 },  "latitude": 33.8252956, "longitude": -117.8307728};
-    localStorage.setItem("origin", JSON.stringify(origin));
-    localStorage.setItem("destination", JSON.stringify(destination));
+    // localStorage.setItem("origin", JSON.stringify(origin));
+    // localStorage.setItem("destination", JSON.stringify(destination));
+   
+
+    if (Platform.OS === "web") {
+      localStorage.setItem("origin", JSON.stringify(origin));
+      localStorage.setItem("destination", JSON.stringify(destination));
+    }
+    
+    if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+      AsyncStorage.setItem("origin", JSON.stringify(origin));
+      AsyncStorage.setItem("destination", JSON.stringify(destination));
+    }
+  
     const [isLoading, setIsLoading] = useState(false);
     const [bestWaypoint, setBestWaypoint] = useState(null);
     const [stateOfMap, setStateOfMap] = useState({
@@ -103,7 +117,7 @@ const MainMapScreen = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-        <ErrorBoundary>
+        {/* <ErrorBoundary> */}
           <View style={styles.container}>
           <ShowMapScreen 
             stateOfMap={stateOfMap} 
@@ -113,7 +127,7 @@ const MainMapScreen = ({navigation}) => {
 
              ></ShowMapScreen>
           </View>
-        </ErrorBoundary>
+        {/* </ErrorBoundary> */}
         </View>
   );
 }

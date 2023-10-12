@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text,Platform } from "react-native";
+import { View, Text } from "react-native";
 import Colors from "../style/colors";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Manual from "./graph/manual"

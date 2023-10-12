@@ -1,4 +1,6 @@
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 function getHubs(current_location)  {
     console.log("Hubs called with current location as ", current_location)
@@ -32,10 +34,26 @@ function getHubs(current_location)  {
         }
         });
         console.log("Hubs are ", hub)
-        hub.push(JSON.parse(localStorage.getItem('origin')));
-        hub.push(JSON.parse(localStorage.getItem('destination')));
-        localStorage.setItem('nodes', JSON.stringify(hub));
-        localStorage.setItem('hub', JSON.stringify(hub));
+        if (Platform.OS === "web") {
+          hub.push(JSON.parse(localStorage.getItem('origin')));
+          hub.push(JSON.parse(localStorage.getItem('destination')));
+          localStorage.setItem('nodes', JSON.stringify(hub));
+          localStorage.setItem('hub', JSON.stringify(hub));
+        }
+        
+        if (Platform.OS === "android" || Platform.OS === "ios") {
+          return Promise.all([
+            AsyncStorage.getItem('origin'),
+            AsyncStorage.getItem('destination')
+          ]).then(([origin, destination]) => {
+            hub.push(JSON.parse(origin));
+            hub.push(JSON.parse(destination));
+            AsyncStorage.setItem("nodes", JSON.stringify(hub));
+            AsyncStorage.setItem("hub", JSON.stringify(hub));
+            return hub;
+          });
+        }
+
         return hub;
       })
       .catch((error) => {

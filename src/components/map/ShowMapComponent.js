@@ -19,7 +19,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../../style/colors";
 
 import floydWarshallNode from "../../apis/FloydWarshallNode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; // Replace with your API key
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
 
@@ -80,7 +82,17 @@ export default class MapScreen extends Component {
 
       if (Platform.OS === "web") {
         try {
-          localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          // localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          if (Platform.OS === "web") {
+            localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          }
+          
+          if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+            AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+          }
+        
+
           console.log("Component Updated Successfully")
           const newcoords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
@@ -133,9 +145,20 @@ export default class MapScreen extends Component {
     console.log("Map panned or dragged");
   };
 
-  onPolylineClicked = () => {
+  // onPolylineClicked = () => {
+    onPolylineClicked = async () => {
     this.setState(() => ({ showIcon: true }));
-    const hub = JSON.parse(localStorage.getItem('hub'));
+    // const hub = JSON.parse(localStorage.getItem('hub'));
+    let hub
+    if (Platform.OS === "web") {
+       hub = JSON.parse(localStorage.getItem('hub'));
+    }
+    
+    if (Platform.OS === "android" || Platform.OS === "ios") {
+      const hubString = await AsyncStorage.getItem('hub');
+      hub = JSON.parse(hubString);
+    }
+
     console.log("Hub array from local storage:", hub);
     console.log("Waypoint:", this.props.stateOfMap.plot.waypoint.latitude);
     const hasWaypoint = hub.some((object) => {
@@ -149,11 +172,28 @@ export default class MapScreen extends Component {
       return true;
     });
     console.log("Filtered hub array:", filteredHub);
-    localStorage.setItem('hub', JSON.stringify(filteredHub));
+    // localStorage.setItem('hub', JSON.stringify(filteredHub));
+    if (Platform.OS === "web") {
+      localStorage.setItem('hub', JSON.stringify(filteredHub));
+    }
+    
+    if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+      AsyncStorage.setItem('hub', JSON.stringify(filteredHub));
+
+    }
+
     console.log("Hub array has waypoint:", hasWaypoint);
     floydWarshallNode(filteredHub).then(async(response) => {
       this.props.stateOfMap.plot.waypoint = response;
-      localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      // localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      if (Platform.OS === "web") {
+        localStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      }
+      
+      if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+        AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
+      }
+
       console.log("Output from floydWarshallNode:", response);
       const newcoords = await fetchRouteData(
         this.props.stateOfMap.plot.origin,
@@ -183,10 +223,14 @@ export default class MapScreen extends Component {
     // Import images with Expo's asset management
     const custom_pin = require("../../assets/custom_image.png");
     return (
+
       <View style={styles.container}>
-        <ErrorBoundary>
+
           {googleMapsLoaded && Platform.OS === "web" ? (
+
             <View style={styles.container}>
+      <ErrorBoundary> 
+
               <MapView
                 style={styles.map}
                 initialRegion={this.state.region}
@@ -261,7 +305,10 @@ export default class MapScreen extends Component {
                       <Text style={styles.rgnText}>{region.longitude}</Text>
                     </View>
               </View>
+       </ErrorBoundary> 
+
             </View>
+
           ) : Platform.OS === "android" || Platform.OS==='ios' ? (
             <View style={styles.container}>
               <MapViewMob
@@ -274,44 +321,65 @@ export default class MapScreen extends Component {
                 mapType="terrain"
                 customMapStyle={MapStyle}
               >
-                <MarkerMob coordinate={origin} title="Origin">
+<MarkerMob coordinate={origin} title="Origin">
                   <View style={styles.markerContainer}>
                     <Image source={custom_pin} style={styles.markerImage} />
                   </View>
                 </MarkerMob>
+
                 <MarkerMob coordinate={destination} title="Destination">
                   <View style={styles.markerContainer}>
                     <Image source={custom_pin} style={styles.markerImage} />
                   </View>
                 </MarkerMob>
 
-                {console.log("Markers are ", markers) ||
-                  markers.map((marker, index) => (
-                    <MarkerMob
-                      key={index}
-                      coordinate={marker.latlng}
-                      title={marker.title}
-                      description={marker.description}
-                    />
-                  ))}
-                {plot.draw && (
+                {markers.map((marker, index) => (
+                  <MarkerMob
+                    key={index}
+                    coordinate={marker.latlng}
+                    title={marker.title}
+                    description={marker.description}
+                  />
+                ))}
+
+                {coords && (
                   <MapViewDirectionsMob
-                    origin={origin}
-                    waypoints={[
-                      {
-                        latitude: plot.waypoint.latitude,
-                        longitude: plot.waypoint.longitude,
-                      },
-                    ]}
-                    destination={destination}
+                  origin={origin}
+                  destination={destination}
+                  waypoint={coords.map((coord) => ({
+                      latitude: coord[0],
+                      longitude: coord[1],
+                    }))}
+                  
+                    strokeColor={showIcon ? "red" : "royalblue"}
+                    tappable={true}
+                    onPress={() => {
+                      this.onPolylineClicked();
+                    }}
                     apikey={apiKey}
                     strokeWidth={14}
-                    strokeColor="hotpink"
+                
                   />
                 )}
+
               </MapViewMob>
+              <TouchableOpacity
+            style={styles.button}
+            onPress={this.props.onPressPlotter}
+          >
+          <View style={{flexDirection:'row'}}>
+          <MaterialCommunityIcons
+                name="map-marker-path"
+                size={24}
+                color={Colors.white}
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.buttonText}>Generate Way</Text>
+
+          </View>
+          </TouchableOpacity>
               <View style={{ flexDirection: "row" ,justifyContent: "space-between" }}>
-                  <Button title="Generate Way"  color={Colors.orange}onPress={this.props.onPressPlotter} />
+                  
                     <View style={styles.rgnView}>
                       <Text style={styles.rgnText}>Region:</Text>
                       <Text style={styles.rgnText}>{region.latitude}</Text>
@@ -322,7 +390,6 @@ export default class MapScreen extends Component {
           ) : (
             <Text>LOADING....</Text>
           )}
-        </ErrorBoundary>
       </View>
     );
   }

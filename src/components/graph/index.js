@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform
 } from "react-native";
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -12,6 +13,7 @@ import ErrorBoundary from "../errorBoundry";
 import Graph from "./Graph";
 import Toast from 'react-native-toast-message';
 import ToastProvider from 'react-native-toast-message'
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -93,8 +95,25 @@ const GraphScreen = () => {
     },
   };
 
-  const fwmatrix = JSON.parse(localStorage.getItem("fwmatrix"));
+  
+  let fwmatrix;
 
+  if (Platform.OS === "web") {
+    fwmatrix = JSON.parse(localStorage.getItem("fwmatrix"));
+    console.log("fwmatrix on web:", fwmatrix);
+  } else if (Platform.OS === "android" || Platform.OS === "ios") {
+    AsyncStorage.getItem("fwmatrix")
+      .then((fwmatrixString) => {
+        fwmatrix = JSON.parse(fwmatrixString);
+        console.log("fwmatrix on mobile:", fwmatrix);
+  
+        // Now you can use the fwmatrix variable as needed
+  
+      })
+      .catch((error) => {
+        console.error("Error fetching fwmatrix from AsyncStorage:", error);
+      });
+  }
   const edges = [
     { from: 1, to: 99, label: fwmatrix[0][5]["value"].toString() },
     { from: 1, to: 100, label: fwmatrix[0][6]["value"].toString() },
@@ -127,7 +146,9 @@ const GraphScreen = () => {
   //   { from: 99, to: 100, label: "", color: "red" },
   // ]
 
-  const prenodes = JSON.parse(localStorage.getItem("nodes")).map((node) => {
+let prenodes
+  if (Platform.OS === "web") {
+     prenodes = JSON.parse(localStorage.getItem("nodes")).map((node) => {
     console.log("Node is ", { ...node, label: node.title + " " + node.id })
     if (node.title === "Source" || node.title === "Destination") {  
       return { ...node, label: node.title };
@@ -135,7 +156,28 @@ const GraphScreen = () => {
     return { ...node, label: node.title + " " + node.id };
     }
   });
-  const bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
+  }
+  
+  if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+   prenodes = JSON.parse(AsyncStorage.getItem("nodes")).map((node) => {
+    console.log("Node is ", { ...node, label: node.title + " " + node.id })
+    if (node.title === "Source" || node.title === "Destination") {  
+      return { ...node, label: node.title };
+    } else {
+    return { ...node, label: node.title + " " + node.id };
+    }
+  });
+  }
+   let bestWaypoint
+  if (Platform.OS === "web") {
+      bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
+
+ }
+ 
+ if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+ bestWaypoint = JSON.parse(AsyncStorage.getItem("best_waypoint"));
+
+ }
 
   const nodes = prenodes.map((node) => {
     if (node.id === 99 || node.id === 100 || node.id === 101) {
@@ -147,13 +189,20 @@ const GraphScreen = () => {
     }
   });
 
+  if (Platform.OS === "web") {
+    localStorage.setItem("edges", JSON.stringify(edges))
+    localStorage.setItem("nodes", JSON.stringify(nodes))
 
-  localStorage.setItem("edges", JSON.stringify(edges))
-  localStorage.setItem("nodes", JSON.stringify(nodes))
+}
 
-  console.log("Nodes are", JSON.parse(localStorage.getItem("nodes")))
-  console.log("Edges are", JSON.parse(localStorage.getItem("edges")))
+if (Platform.OS === "android" ||Platform.OS === "ios" ) {
+  AsyncStorage.setItem("edges", JSON.stringify(edges))
+  AsyncStorage.setItem("nodes", JSON.stringify(nodes))
 
+} 
+
+  // console.log("Nodes are", JSON.parse(localStorage.getItem("nodes")))
+  // console.log("Edges are", JSON.parse(localStorage.getItem("edges")))
 
   const graph = {
     edges: edges,
