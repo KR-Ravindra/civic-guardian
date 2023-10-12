@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import { View, Text, Modal, StyleSheet } from 'react-native';
 import Colors from '../../style/colors';
 
 const CustomToast = ({ message, onClose }) => {
@@ -10,11 +10,6 @@ const CustomToast = ({ message, onClose }) => {
           <View style={styles.blueBackground}></View>
           <View style={styles.whiteBackground}>
             <Text style={styles.message}>{message}</Text>
-            <View style={styles.okButtonContainer}>
-              <TouchableOpacity style={styles.okButton} onPress={onClose}>
-                <Text style={styles.okText}>OK</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </View>
@@ -35,7 +30,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Use flexDirection 'row' to align two views horizontally
   },
   blueBackground: {
-    backgroundColor: Colors.info,
+    backgroundColor: Colors.orange,
     width: '5%', // Adjust the percentage as needed
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
@@ -52,18 +47,6 @@ const styles = StyleSheet.create({
   message: {
     color: Colors.black,
     marginBottom: 8,
-  },
-  okButtonContainer: {
-    alignSelf: 'flex-end', // Align the button to the end of the container
-  },
-  okButton: {
-    backgroundColor: Colors.white,
-    padding: 6,
-    borderRadius: 5,
-  },
-  okText: {
-    color: Colors.black,
-    fontWeight: 'bold',
   },
 });
 

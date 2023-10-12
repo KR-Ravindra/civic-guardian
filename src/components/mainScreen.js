@@ -7,6 +7,7 @@ import Manual from "./graph/manual"
 
 const MainScreen = ({ navigation }) => {
   const [isModalVisible,setIsModalVisible]=useState(false)
+  const [isHovered, setIsHovered] = useState(false);
 
   const goToTabNavigator = () => {
       navigation.navigate('Map');
@@ -21,11 +22,18 @@ const MainScreen = ({ navigation }) => {
     setIsModalVisible(false);
   };
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
   return (
     <>
       <View
-        style={{ justifyContent: "center", alignItems: "flex-end", margin: 10 }}
-      >
+        style={{ justifyContent: "center", alignItems: "flex-end", margin: 10 }}>
         <TouchableOpacity onPress={()=>{toggleModal()}}>
           <Text
             style={{
@@ -40,14 +48,25 @@ const MainScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       {isModalVisible && <Manual isVisible={isModalVisible} onClosePress={()=>closeModal()}/>}
-
-      <View style={{ flex: 1, alignItems: "center", justifyContent:'center' }}>
+      <View 
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <TouchableOpacity onPress={goToTabNavigator}>
-         
-           <Text style={{ fontSize: 160, fontWeight: "bold", color: Colors.orange, marginBottom:'7%' }}>
-          Civic Guardian...
-        </Text>
+          <Text
+            style={{
+              fontSize: isHovered ? 200 : 160,
+              fontWeight: "bold",
+              color: Colors.orange,
+              marginBottom: isHovered ? "5%" : "7%",
+            }}
+          >
+            Civic Guardian...
+          </Text>
         </TouchableOpacity>
+      </View>
       </View>
     </>
   );

@@ -215,22 +215,23 @@ if (Platform.OS === "android" ||Platform.OS === "ios" ) {
     setToastMessage(message);
     setToastVisible(true);
   };
-  
-  
+
+ 
   const wait = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
   
 
   const onSimulation = () => {
+    showToast("Starting Simulation")
     setSimulation(true);
     setStep1(true);
     wait(2500)
       .then(() => showToast("Oops! Traffic Detected"))
       .then(() => {
-        setStep1(false);
-        setStep2(true);
-      })
+          setStep1(false);
+          setStep2(true);
+        })
       .then(() => wait(2500))
       .then(() =>
         showToast(
@@ -251,11 +252,12 @@ if (Platform.OS === "android" ||Platform.OS === "ios" ) {
       })
       .then(() => wait(2500))
       .then(() => showToast("Generating the complete matrix!", "OK"))
-
       .then(() => {
         setStep4(false);
         setStep5(true);
+        setToastVisible(false)
       });
+
   };
   const onReset = () => {
     setStep1(false);
