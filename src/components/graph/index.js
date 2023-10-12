@@ -168,7 +168,11 @@ let prenodes
       if (node.id === 99 || node.id === 100 || node.id === 101) {
         return { ...node, group: "green" };
       } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
+        try {
         return { ...node, group: "green", id: 101, label: node.title };
+        } catch {
+          console.log("Caught")
+        }
       } else {
         return node;
       }
