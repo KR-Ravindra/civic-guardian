@@ -10,7 +10,7 @@ async function floydWarshallNode(nodes) {
         data: nodesList
     }
 
-    let url = "http://192.168.1.216:8000/getBestWayPoint"
+    let url = "http://10.67.120.196:8000/getBestWayPoint"
 
     const response = await fetch(url, {
         method: "POST",

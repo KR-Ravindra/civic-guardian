@@ -92,8 +92,6 @@ export default class MapScreen extends Component {
             AsyncStorage.setItem('best_waypoint', JSON.stringify(this.props.stateOfMap.plot.waypoint))
           }
         
-
-          console.log("Component Updated Successfully")
           const newcoords = await fetchRouteData(
             this.props.stateOfMap.plot.origin,
             this.props.stateOfMap.plot.waypoint,
@@ -159,10 +157,7 @@ export default class MapScreen extends Component {
       hub = JSON.parse(hubString);
     }
 
-    console.log("Hub array from local storage:", hub);
-    console.log("Waypoint:", this.props.stateOfMap.plot.waypoint.latitude);
     const hasWaypoint = hub.some((object) => {
-      console.log(object.latlng.latitude)
       return object.latlng.latitude == this.props.stateOfMap.plot.waypoint.latitude;
     });
     const filteredHub = hub.filter((object) => {

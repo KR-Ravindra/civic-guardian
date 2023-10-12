@@ -44,8 +44,6 @@ function getHubs(current_location)  {
           let pushOrigin, pushDestination
           AsyncStorage.getItem('origin').then((value) => { pushOrigin = JSON.parse(value); return pushOrigin}).then((pushOrigin) => hub.push(pushOrigin));
           AsyncStorage.getItem('destination').then((value) => { pushDestination = JSON.parse(value); return pushDestination}).then((pushDestination) => hub.push(pushDestination));
-
-          console.log("hubs at mobile are", hub)
           AsyncStorage.setItem("nodes", JSON.stringify(hub));
           AsyncStorage.setItem("hub", JSON.stringify(hub));
           };
