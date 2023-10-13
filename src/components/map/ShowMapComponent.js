@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import loadGoogleMapsAPI from "./webMapComponent"; // Import the function
-import MapStyle from "./mapStyle";
+import mapStyle from "./mapStyle";
 import ErrorBoundary from "../errorBoundry";
 import fetchRouteData from "../../apis/GetCoords";
 
@@ -20,10 +20,12 @@ import Colors from "../../style/colors";
 
 import floydWarshallNode from "../../apis/FloydWarshallNode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TextInput } from "react-native-gesture-handler";
 
 const apiKey = "AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E"; // Replace with your API key
 
 let MapViewMob, MarkerMob, MapViewDirectionsMob;
+
 
 if (Platform.OS === "android" ||Platform.OS === "ios" ) 
   {
@@ -66,10 +68,6 @@ export default class MapScreen extends Component {
       waypoint: {}, // Add a state variable to control icon visibility
     };
     this.debouncedOnRegionChange = debounce(this.onRegionChange, 10);
-  }
-
-  goNavigate = () => {
-    this.props.navigation.navigate('NewSplitScreen');
   }
 
 
@@ -133,6 +131,7 @@ export default class MapScreen extends Component {
     console.log("Region changed:", region);
   };
 
+  failMapsResponse = "This API project is not authorized to use this API. Please ensure this API is activated in the Google Cloud Console: https://console.cloud.google.com/apis/api/maps_backend?project=_ "
   onPress = (event) => {
     console.log("Map pressed:", event.nativeEvent.coordinate);
   };
@@ -299,11 +298,18 @@ export default class MapScreen extends Component {
 
           </View>
           </TouchableOpacity>
-                    <View style={styles.rgnView}>
-                      <Text style={styles.rgnText}>Region:</Text>
-                      <Text style={styles.rgnText}>{region.latitude}</Text>
-                      <Text style={styles.rgnText}>{region.longitude}</Text>
-                    </View>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden' }}>
+        <TextInput style={{ flex: 1, padding: 5 }} placeholder="Enter origin" placeholderTextColor="#808080"onSubmitEditing={async (event) => {
+          console.log("Text recieved is ", event.nativeEvent.text)
+              const originResponseJson = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${event.nativeEvent.text}&key=AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E`).then((response)=> {return response.json()}).then((data) => {console.log(data.results[0].geometry.location), alert(this.failMapsResponse)});
+        }} />
+        <View style={{ width: 1, backgroundColor: '#ccc' }} />
+        <TextInput style={{ flex: 1, padding: 5 }} placeholder="Enter destination" placeholderTextColor="#808080" onSubmitEditing={async (event) => {
+              const destinationResponseJson = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${event.nativeEvent.text}&key=AIzaSyA0P4DLkwK2kdikcnu8NPS69mvYfwjCQ_E`).then((response)=> {return response.json()}).then((data) => {console.log(data.results[0].geometry.location), alert(this.failMapsResponse)});
+        }} />
+      </View>
+    </View>
             <TouchableOpacity
             style={styles.button}
             onPress={() => {console.log("Pressed"); Linking.openURL(`https://www.google.com/maps/dir/?api=1&origin=${plot.origin.latitude},${plot.origin.longitude}&destination=${plot.destination.latitude},${plot.destination.longitude}&waypoints=${plot.waypoint.latitude},${plot.waypoint.longitude}`)}}
@@ -316,7 +322,6 @@ export default class MapScreen extends Component {
                 style={{ marginRight: 10 }}
               />
               <Text style={styles.buttonText}>Google Maps</Text>
-
           </View>
           </TouchableOpacity>
               </View>
@@ -332,8 +337,7 @@ export default class MapScreen extends Component {
                     onRegionChange={(new_region) => {
                       this.debouncedOnRegionChange(new_region);
                     }}
-                    mapType="terrain"
-                    customMapStyle={MapStyle}
+                    customMapStyle={mapStyle}
                    >
                     <MarkerMob coordinate={origin} title="Origin">
                       <View style={styles.markerContainer}>
