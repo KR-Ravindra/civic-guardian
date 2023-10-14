@@ -11,6 +11,8 @@ In this project we had implemented intrusive UI components to power rather a cus
 docker-compose up 
 ```
 
+[Link to documentation - API](https://documenter.getpostman.com/view/12122001/2s9YJc23n7)
+
 # Screenshots of UI
 
 Landing Page:
