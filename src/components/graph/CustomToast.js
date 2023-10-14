@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, Modal, StyleSheet } from 'react-native';
-import Colors from '../../style/colors';
+import React from "react";
+import { View, Text, Modal, StyleSheet } from "react-native";
+import Colors from "../../style/colors";
 
-const CustomToast = ({ message, onClose }) => {
+const CustomToast = ({ message, onClose }) => { // This is the toast component
   return (
     <Modal transparent={true} visible={true}>
       <View style={styles.modalContainer}>
@@ -17,21 +17,21 @@ const CustomToast = ({ message, onClose }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ // Styles for the toast component
   modalContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   toastContainer: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     padding: 16,
     borderRadius: 8,
-    width: '29%',
-    flexDirection: 'row', // Use flexDirection 'row' to align two views horizontally
+    width: "29%",
+    flexDirection: "row", // Use flexDirection 'row' to align two views horizontally
   },
   blueBackground: {
     backgroundColor: Colors.orange,
-    width: '5%', // Adjust the percentage as needed
+    width: "5%", // Adjust the percentage as needed
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
   },
@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
     padding: 9,
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   message: {
     color: Colors.black,

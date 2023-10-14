@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Platform
+  Platform,
 } from "react-native";
 import Colors from "../../style/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -12,11 +12,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ErrorBoundary from "../errorBoundry";
 import Graph from "./Graph";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import CustomToast from './CustomToast';
+import CustomToast from "./CustomToast";
 
-
-
-const GraphScreen = () => {
+const GraphScreen = () => { // graphOptions and graphNodes are props
   const [step1, setStep1] = useState(false);
   const [step2, setStep2] = useState(false);
   const [step3, setStep3] = useState(false);
@@ -24,7 +22,7 @@ const GraphScreen = () => {
   const [step5, setStep5] = useState(false);
   const [simulation, setSimulation] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState("");
 
   const options = {
     interaction: {
@@ -96,10 +94,9 @@ const GraphScreen = () => {
     },
   };
 
-  
   let fwmatrix;
 
-  if (Platform.OS === "web") {
+  if (Platform.OS === "web") { // if platform is web, get the fwmatrix from local storage
     fwmatrix = JSON.parse(localStorage.getItem("fwmatrixForGraph"));
     console.log("fwmatrix at graph on web:", fwmatrix);
   } else if (Platform.OS === "android" || Platform.OS === "ios") {
@@ -113,65 +110,80 @@ const GraphScreen = () => {
       });
     fwmatrix = mobFWMatrix;
   }
-  let edges
+  let edges;
   if (Platform.OS === "web") {
-  edges = [
-    { from: 1, to: 99, label: fwmatrix[0][5]["value"].toString() },
-    { from: 1, to: 100, label: fwmatrix[0][6]["value"].toString() },
-    { from: 2, to: 99, label: fwmatrix[1][5]["value"].toString() },
-    { from: 2, to: 100, label: fwmatrix[1][6]["value"].toString() },
-    { from: 3, to: 99, label: fwmatrix[2][5]["value"].toString() },
-    { from: 3, to: 100, label: fwmatrix[2][6]["value"].toString() },
-    { from: 4, to: 99, label: fwmatrix[3][5]["value"].toString() },
-    { from: 4, to: 100, label: fwmatrix[3][6]["value"].toString() },
-    { from: 5, to: 99, label: fwmatrix[4][5]["value"].toString() },
-    { from: 5, to: 100, label: fwmatrix[4][6]["value"].toString() },
-    { from: 101, to: 99, label: fwmatrix[4][6]["value"].toString(), color: "green" },
-    { from: 101, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "green" },
-    { from: 99, to: 100, label: fwmatrix[4][6]["value"].toString(), color: "red" },
-  ]
-} else {
-  edges = [
-    { from: 1, to: 99, label: "" },
-    { from: 1, to: 100, label: "" },
-    { from: 2, to: 99, label: "" },
-    { from: 2, to: 100, label: "" },
-    { from: 3, to: 99, label: "" },
-    { from: 3, to: 100, label: "" },
-    { from: 4, to: 99, label: "" },
-    { from: 4, to: 100, label: "" },
-    { from: 5, to: 99, label: "" },
-    { from: 5, to: 100, label: "" },
-    { from: 101, to: 99, label: "", color: "green" },
-    { from: 101, to: 100, label: "", color: "green" },
-    { from: 99, to: 100, label: "", color: "red" },
-  ]
-  console.log("Edges are ", edges)
-}
+    edges = [
+      { from: 1, to: 99, label: fwmatrix[0][5]["value"].toString() },
+      { from: 1, to: 100, label: fwmatrix[0][6]["value"].toString() },
+      { from: 2, to: 99, label: fwmatrix[1][5]["value"].toString() },
+      { from: 2, to: 100, label: fwmatrix[1][6]["value"].toString() },
+      { from: 3, to: 99, label: fwmatrix[2][5]["value"].toString() },
+      { from: 3, to: 100, label: fwmatrix[2][6]["value"].toString() },
+      { from: 4, to: 99, label: fwmatrix[3][5]["value"].toString() },
+      { from: 4, to: 100, label: fwmatrix[3][6]["value"].toString() },
+      { from: 5, to: 99, label: fwmatrix[4][5]["value"].toString() },
+      { from: 5, to: 100, label: fwmatrix[4][6]["value"].toString() },
+      {
+        from: 101,
+        to: 99,
+        label: fwmatrix[4][6]["value"].toString(),
+        color: "green",
+      },
+      {
+        from: 101,
+        to: 100,
+        label: fwmatrix[4][6]["value"].toString(),
+        color: "green",
+      },
+      {
+        from: 99,
+        to: 100,
+        label: fwmatrix[4][6]["value"].toString(),
+        color: "red",
+      },
+    ];
+  } else {
+    edges = [
+      { from: 1, to: 99, label: "" },
+      { from: 1, to: 100, label: "" },
+      { from: 2, to: 99, label: "" },
+      { from: 2, to: 100, label: "" },
+      { from: 3, to: 99, label: "" },
+      { from: 3, to: 100, label: "" },
+      { from: 4, to: 99, label: "" },
+      { from: 4, to: 100, label: "" },
+      { from: 5, to: 99, label: "" },
+      { from: 5, to: 100, label: "" },
+      { from: 101, to: 99, label: "", color: "green" },
+      { from: 101, to: 100, label: "", color: "green" },
+      { from: 99, to: 100, label: "", color: "red" },
+    ];
+    console.log("Edges are ", edges);
+  }
 
-let prenodes
+  let prenodes;
   if (Platform.OS === "web") {
-     prenodes = JSON.parse(localStorage.getItem("nodesForGraph")).map((node) => {
-    console.log("Node is ", { ...node, label: node.title + " " + node.id })
-    if (node.title === "Source" || node.title === "Destination") {  
-      return { ...node, label: node.title };
-    } else {
-    return { ...node, label: node.title + " " + node.id };
-    }
-  });
-  } 
-   let bestWaypoint
-   let nodes
+    prenodes = JSON.parse(localStorage.getItem("nodesForGraph")).map((node) => {
+      console.log("Node is ", { ...node, label: node.title + " " + node.id });
+      if (node.title === "Source" || node.title === "Destination") {
+        return { ...node, label: node.title };
+      } else {
+        return { ...node, label: node.title + " " + node.id };
+      }
+    });
+  }
+  let bestWaypoint;
+  let nodes;
   if (Platform.OS === "web") {
-      bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
-      nodes = prenodes.map((node) => {
+    bestWaypoint = JSON.parse(localStorage.getItem("best_waypoint"));
+    nodes = prenodes.map((node) => {
       if (node.id === 99 || node.id === 100 || node.id === 101) {
         return { ...node, group: "green" };
       } else if (bestWaypoint["latitude"] == node.latlng.latitude) {
         try {
-        return { ...node, group: "green", id: 101, label: node.title };
+          return { ...node, group: "green", id: 101, label: node.title };
         } catch {
-          console.log("Caught")
+          console.log("Caught");
         }
       } else {
         return node;
@@ -255,41 +267,38 @@ let prenodes
         group: "green",
         id: 100,
       },
-    ]
+    ];
   }
 
   if (Platform.OS === "web") {
-    localStorage.setItem("edges", JSON.stringify(edges))
-    localStorage.setItem("nodesForGraph", JSON.stringify(nodes))
-
-}
+    localStorage.setItem("edges", JSON.stringify(edges));
+    localStorage.setItem("nodesForGraph", JSON.stringify(nodes));
+  }
 
   const graph = {
     edges: edges,
     nodes: nodes,
-  }
+  };
 
   const showToast = (message) => {
     setToastMessage(message);
     setToastVisible(true);
   };
 
- 
   const wait = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
-  
 
-  const onSimulation = () => {
-    showToast("Starting Simulation")
+  const onSimulation = () => { // starts the simulation
+    showToast("Starting Simulation");
     setSimulation(true);
     setStep1(true);
     wait(2500)
       .then(() => showToast("Oops! Traffic Detected"))
       .then(() => {
-          setStep1(false);
-          setStep2(true);
-        })
+        setStep1(false);
+        setStep2(true);
+      })
       .then(() => wait(2500))
       .then(() =>
         showToast(
@@ -313,9 +322,8 @@ let prenodes
       .then(() => {
         setStep4(false);
         setStep5(true);
-        setToastVisible(false)
+        setToastVisible(false);
       });
-
   };
   const onReset = () => {
     setStep1(false);
@@ -326,34 +334,34 @@ let prenodes
     setSimulation(false);
   };
 
-  return (
+  return ( // graphOptions and graphNodes are props
     <View style={styles.container}>
       <ErrorBoundary>
-      {toastVisible && (
-        <CustomToast
-          message={toastMessage}
-          onClose={() => setToastVisible(false)}
-        />
-      )}
-      <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-        {!simulation && (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              onSimulation();
-            }}
-          >
-            <View style={{ flexDirection: "row"}}>
-              <MaterialCommunityIcons
-                name="graphql"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.buttonText}>Simulate Now</Text>
-            </View>
-          </TouchableOpacity>
+        {toastVisible && (
+          <CustomToast
+            message={toastMessage}
+            onClose={() => setToastVisible(false)}
+          />
         )}
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          {!simulation && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onSimulation();
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <MaterialCommunityIcons
+                  name="graphql"
+                  size={24}
+                  color={Colors.white}
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={styles.buttonText}>Simulate Now</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
 
         {step1 && (
@@ -402,29 +410,26 @@ let prenodes
             }}
           ></Graph>
         )}
-        {step5 && (
-          <Graph graphOptions={options} graphNodes={graph}></Graph>
-        )}
-      <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-
-        {simulation && step5 && (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              onReset();
-            }}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <MaterialCommunityIcons
-                name="graphql"
-                size={24}
-                color={Colors.white}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={styles.buttonText}>Reset Simulation</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        {step5 && <Graph graphOptions={options} graphNodes={graph}></Graph>}
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          {simulation && step5 && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onReset();
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <MaterialCommunityIcons
+                  name="graphql"
+                  size={24}
+                  color={Colors.white}
+                  style={{ marginRight: 10 }}
+                />
+                <Text style={styles.buttonText}>Reset Simulation</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </ErrorBoundary>
     </View>
@@ -440,9 +445,8 @@ const styles = StyleSheet.create({
     padding: 8,
     margin: 5,
     borderRadius: 5,
-    alignItems:'center',
+    alignItems: "center",
     height: 35,
-  
   },
   buttonText: {
     color: Colors.white,
