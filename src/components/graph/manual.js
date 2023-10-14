@@ -11,6 +11,7 @@ import mapMobile from '../../assets/iosmobile (1).jpg'
 import simMobile from '../../assets/ios mob sim (2).jpg'
 import darkMode from '../../assets/darkmobile.jpg'
 import darkModeMap from '../../assets/darkmapmob (1).jpg'
+import GoogleMap from '../../assets/googleMap.png'
 
 
 
@@ -23,43 +24,44 @@ const Manual = ({ onClosePress }) => {
           <ScrollView>
             <View style={{width:350, margin:10}}>
             <Image source={screen1} style={styles.imageStyle} />
-            <Text style={{alignItems:'center'}}>This is Main Screen</Text>
+            <Text style={{alignItems:'center'}}>Select CIVIC GUARDIAN on Landing Page</Text>
             </View>
             <View style={{width:350, margin:10}}>
             <Image source={screen2} style={styles.imageStyle} />
-            <Text style={{alignItems:'center'}}>This is Home Screen</Text>
+            <Text style={{alignItems:'center'}}>You will be directed to map screen where you can Generate Way</Text>
             </View>
             <View style={{width:350, margin:10}}>
             <Image source={screen3} style={styles.imageStyle} />
-            <Text style={{alignItems:'center'}}>This is map Screen</Text>
+            <Text style={{alignItems:'center'}}>Once route is generated click on any route if you need alternate path</Text>
+            <Image source={GoogleMap} style={styles.imageStyle} />
+            <Text style={{alignItems:'center'}}>Take to google maps screen will port this destination exactly to your maps</Text>
+
             </View>
+
             <View style={{width:350, margin:10}}>
+            <Text style={{alignItems:'center'}}>About Graph Screen:</Text>
             <Image source={screen4} style={styles.imageStyle} />
-            <Text style={{alignItems:'center'}}>This is Simulation Screen</Text>
+            <Text style={{alignItems:'center'}}>Click Simulate now to understand FloydWarshall implementation</Text>
+            <Text style={{alignItems:'center'}}>Click Reset Simulation to clear or watch again</Text>
             </View>
-            <Text style={{alignItems:'center'}}>This is All about Web Screen</Text>
             <View style={{width:350, margin:10}}>
+            <Text style={{alignItems:'center'}}>This is All about mobile screen</Text>
             <Image source={mapMobile} style={styles.mobImageStyle} />
-            <Text style={{alignItems:'center'}}>This is map Screen</Text>
             </View>
             <View style={{width:350, margin:10}}>
             <Image source={lightModeMap} style={styles.mobImageStyle} />
-            <Text style={{alignItems:'center'}}>This is MapDirection Screen</Text>
             </View>
             <View style={{width:350, margin:10}}>
             <Image source={simMobile} style={styles.mobImageStyle} />
-            <Text style={{alignItems:'center'}}>This is Simulation Screen</Text>
             </View>
-            <Text style={{alignItems:'center'}}>This is All about mobile screen</Text>
             <View style={{width:350, margin:10}}>
             <Image source={darkMode} style={styles.mobImageStyle} />
-            <Text style={{alignItems:'center'}}>This is map Screen</Text>
             </View>
             <View style={{width:350, margin:10}}>
             <Image source={darkModeMap} style={styles.mobImageStyle} />
-            <Text style={{alignItems:'center'}}>This is MapDirection Screen</Text>
+            <Text style={{alignItems:'center'}}>Thank you</Text>
             </View>
-            <Text style={{alignItems:'center'}}>This is All about Dark Mode in mobile</Text>
+
 
 
           </ScrollView>
