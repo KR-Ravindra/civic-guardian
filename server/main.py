@@ -97,7 +97,7 @@ async def test():
  [{'from': 'B', 'to': 'A', 'value': 99999, 'via': ''},
   {'from': 'B', 'to': 'B', 'value': 0, 'via': 'B'},
   {'from': 'B', 'to': 'C', 'value': 3, 'via': ''},
-  {'from': 'B', 'to': 'D', 'value': 99999, 'via': ''}],
+  {'from': 'B', 'to': 'D', 'value': 98999, 'via': ''}],
  [{'from': 'C', 'to': 'A', 'value': 99999, 'via': ''},
   {'from': 'C', 'to': 'B', 'value': 99999, 'via': ''},
   {'from': 'C', 'to': 'C', 'value': 0, 'via': 'C'},
