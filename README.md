@@ -12,6 +12,7 @@ docker-compose up
 ```
 
 [Link to documentation - API](https://documenter.getpostman.com/view/12122001/2s9YJc23n7)
+[Youtube Video link](https://youtu.be/7vQs4laBbP8)
 
 # Screenshots of UI
 
